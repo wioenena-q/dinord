@@ -1,5 +1,5 @@
 import { EventEmitter } from "../../deps.ts";
-import WebSocketClient from "./ws/WebSocketClient.ts";
+import WebSocketManager from "./ws/WebSocketManager.ts";
 
 
 
@@ -16,7 +16,7 @@ import WebSocketClient from "./ws/WebSocketClient.ts";
  */
 export class Client extends EventEmitter {
 
-    private ws = new WebSocketClient(this);
+    private ws = new WebSocketManager(this);
 
     /**
      *

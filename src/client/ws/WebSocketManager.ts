@@ -14,7 +14,7 @@ import type { IPayload } from "../../structures/typedefs/deps.ts";
  * @class WebSocketClient
  * @extends {EventEmitter}
  */
-export default class WebSocketClient extends EventEmitter {
+export default class WebSocketManager extends EventEmitter {
 
     /**
      *
