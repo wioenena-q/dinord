@@ -7,6 +7,8 @@ import {
     Identify
 } from "../../util/deps.ts";
 import type { IPayload } from "../../structures/typedefs/deps.ts";
+
+
 /**
  *
  * Class to provide WebSocket connection.
@@ -73,7 +75,7 @@ export default class WebSocketManager extends EventEmitter {
             Logger.info(ev);
         }
 
-        this.socket.onmessage = (event) => {
+        this.socket.onmessage = async (event) => {
             const data: IPayload = JSON.parse(event.data);
             const { d, op, t } = data;
             switch (op) {
@@ -81,10 +83,15 @@ export default class WebSocketManager extends EventEmitter {
                     this.interval = this.heartbeat(d.heartbeat_interval);
                     Identify.d.token = this.client.getToken!;
                     this.socket.send(JSON.stringify(Identify));
-                    this.interval;
                     break;
                 case 0:
                     Logger.debug(`An event has been triggered.`, t)
+                    try {
+                        const { default: action } = await import(`./actions/${t}.ts`);
+                        action(this.client, data);
+                    } catch (e) {
+                        Logger.error(e);
+                    }
                     break;
             }
         }
