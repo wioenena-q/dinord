@@ -105,11 +105,16 @@ export class User extends Base {
      */
     private premiumType!: string;
 
+    /**
+     * Creates an instance of User.
+     * @param {Client} client
+     * @param {*} data
+     * @memberof User
+     */
     public constructor(client: Client, data: any) {
         super(client);
         this.id = data.id;
         this.patch(data);
-
     }
 
     protected patch(data: any) {
