@@ -1,6 +1,0 @@
-{
-    "compilerOptions": {
-        "noUnusedParameters": true,
-        "importsNotUsedAsValues": "error"
-    }
-}
