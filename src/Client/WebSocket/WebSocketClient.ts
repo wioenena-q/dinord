@@ -33,7 +33,7 @@ export class WebSocketClient extends EventEmitter {
      * @memberof WebSocketClient
      */
     public async connect() {
-        this.socket = await this.connectWebSocket(Constants.Discord.GATEWAY);
+        await this.connectWebSocket(Constants.Discord.GATEWAY);
         this.socket.onmessage = this.onMessage;
     }
 
