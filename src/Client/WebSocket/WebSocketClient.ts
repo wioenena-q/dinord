@@ -1,5 +1,6 @@
 import { EventEmitter } from "../../../deps.ts";
 import * as Constants from "../../Utils/Constants.ts";
+import { Client } from "../Client.ts";
 
 /**
  *
@@ -29,6 +30,25 @@ export class WebSocketClient extends EventEmitter {
 
     /**
      *
+     * The base client.
+     * @private
+     * @type {unknown}
+     * @memberof WebSocketClient
+     */
+    private client:Client;
+
+    /**
+     * Creates an instance of WebSocketClient.
+     * @param {Client} client - Base client.
+     * @memberof WebSocketClient
+     */
+    public constructor(client:Client) {
+        super();
+        this.client = client;
+    }
+
+    /**
+     *
      * The method to connect to the API.
      * @memberof WebSocketClient
      */
@@ -37,6 +57,13 @@ export class WebSocketClient extends EventEmitter {
         this.socket.onmessage = this.onMessage;
     }
 
+    /**
+     *
+     *
+     * @private
+     * @param {unknown} d
+     * @memberof WebSocketClient
+     */
     private onMessage(d:unknown) {
 
     }
