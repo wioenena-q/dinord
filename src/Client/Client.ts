@@ -10,7 +10,7 @@ export class Client extends EventEmitter {
      * @type {ClientOptions}
      * @memberof Client
      */
-    private options: ClientOptions;
+    private options: IClientOptions;
 
     /**
      *
@@ -35,7 +35,7 @@ export class Client extends EventEmitter {
      * @param {ClientOptions} [options]
      * @memberof Client
      */
-    public constructor(options: ClientOptions = {}) {
+    public constructor(options: IClientOptions = {}) {
         super();
         this.options = { ...options };
 
