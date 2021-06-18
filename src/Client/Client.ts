@@ -1,5 +1,5 @@
 import { EventEmitter } from "../../deps.ts";
-import { ClientOptions } from "../Types/ClientTypes.ts";
+import { IClientOptions } from "../Types/IClientTypes.ts";
 import { WebSocketClient } from "./WebSocket/WebSocketClient.ts";
 
 export class Client extends EventEmitter {
@@ -39,8 +39,9 @@ export class Client extends EventEmitter {
         super();
         this.options = { ...options };
 
-        if (typeof this.options.token !== "undefined")
-            this.token = options.token;
+        if ("token" in this.options) {
+            this.token = this.options.token;
+        }
     }
 
     /**
