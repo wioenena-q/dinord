@@ -1,17 +1,6 @@
 import { EventEmitter } from "../../../deps.ts";
 import * as Constants from "../../Utils/Constants.ts";
 
-function connectWebSocket(url:string):Promise<WebSocket> {
-    return new Promise<WebSocket>((res, rej) => {
-        const socket:WebSocket = new WebSocket(url);
-
-        socket.onopen = () => {
-            res(socket);
-        };
-        socket.onerror = rej;
-    });
-}
-
 /**
  *
  * The class to connect to the API.
@@ -44,11 +33,32 @@ export class WebSocketClient extends EventEmitter {
      * @memberof WebSocketClient
      */
     public async connect() {
-        this.socket = await connectWebSocket(Constants.Discord.GATEWAY);
+        this.socket = await this.connectWebSocket(Constants.Discord.GATEWAY);
         this.socket.onmessage = this.onMessage;
     }
 
     private onMessage(d:unknown) {
 
+    }
+
+    /**
+     *
+     *
+     * @private
+     * @param {string} url
+     * @returns {Promise<WebSocket>}
+     * @memberof WebSocketClient
+     */
+    private connectWebSocket(url:string):Promise<void> {
+        return new Promise<void>((res, rej) => {
+            const socket:WebSocket = new WebSocket(url);
+
+            socket.onopen = () => {
+                this.socket = socket;
+                res();
+            };
+
+            socket.onerror = rej;
+        });
     }
 }
