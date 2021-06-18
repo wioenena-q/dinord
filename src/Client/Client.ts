@@ -35,9 +35,12 @@ export class Client extends EventEmitter {
      * @param {ClientOptions} [options]
      * @memberof Client
      */
-    public constructor(options?: ClientOptions) {
+    public constructor(options: ClientOptions = {}) {
         super();
         this.options = { ...options };
+
+        if (typeof this.options.token !== "undefined")
+            this.token = options.token;
     }
 
     /**
