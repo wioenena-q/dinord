@@ -103,6 +103,7 @@
         "no-plusplus": "off",
         "no-return-assign": "off",
         "no-bitwise": "off",
-        "operator-linebreak": "off"
+        "operator-linebreak": "off",
+        "object-curly-newline": "off"
     }
 }
