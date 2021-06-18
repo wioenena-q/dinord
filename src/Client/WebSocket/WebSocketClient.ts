@@ -49,5 +49,6 @@ export class WebSocketClient extends EventEmitter {
     }
 
     private onMessage(d:unknown) {
+
     }
 }
