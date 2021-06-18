@@ -1,6 +1,8 @@
+/* eslint-disable camelcase */
 import { EventEmitter } from "../../../deps.ts";
 import * as Constants from "../../Utils/Constants.ts";
 import { Client } from "../Client.ts";
+import type { IPayload } from "../../Types/IPayload.ts";
 
 /**
  *
@@ -17,7 +19,7 @@ export class WebSocketClient extends EventEmitter {
      * @type {WebSocket}
      * @memberof WebSocketClient
      */
-    private socket!:WebSocket;
+    private socket!: WebSocket;
 
     /**
      *
@@ -26,7 +28,7 @@ export class WebSocketClient extends EventEmitter {
      * @type {number}
      * @memberof WebSocketClient
      */
-    private guildSize!:number;
+    private guildSize!: number;
 
     /**
      *
@@ -35,14 +37,16 @@ export class WebSocketClient extends EventEmitter {
      * @type {unknown}
      * @memberof WebSocketClient
      */
-    private client:Client;
+    private client: Client;
+
+    private interval!: number;
 
     /**
      * Creates an instance of WebSocketClient.
      * @param {Client} client - Base client.
      * @memberof WebSocketClient
      */
-    public constructor(client:Client) {
+    public constructor(client: Client) {
         super();
         this.client = client;
     }
@@ -64,8 +68,16 @@ export class WebSocketClient extends EventEmitter {
      * @param {unknown} d
      * @memberof WebSocketClient
      */
-    private onMessage(d:unknown) {
+    private onMessage(message: MessageEvent<string>) {
+        const data: IPayload = JSON.parse(message.data);
+        const { d, t, s, op } = data;
 
+        let lastSeq = s;
+        // OP Code Hello.
+        if (op === Constants.OPCodes.HELLO) {
+            const { heartbeat_interval } = d as Record<string, unknown>;
+            this.heartbeat(heartbeat_interval as number);
+        }
     }
 
     /**
@@ -76,9 +88,9 @@ export class WebSocketClient extends EventEmitter {
      * @returns {Promise<WebSocket>}
      * @memberof WebSocketClient
      */
-    private connectWebSocket(url:string):Promise<void> {
+    private connectWebSocket(url: string): Promise<void> {
         return new Promise<void>((res, rej) => {
-            const socket:WebSocket = new WebSocket(url);
+            const socket: WebSocket = new WebSocket(url);
 
             socket.onopen = () => {
                 this.socket = socket;
@@ -87,5 +99,24 @@ export class WebSocketClient extends EventEmitter {
 
             socket.onerror = rej;
         });
+    }
+
+    private heartbeat(interval: number) {
+        this.interval = setInterval(() => {
+            this.socket.send(
+                JSON.stringify({
+                    op: 2,
+                    d: {
+                        token: this.client.getToken,
+                        intents: 513,
+                        properties: {
+                            $os: Deno.build.os,
+                            $browser: "dinord",
+                            $device: "dinord"
+                        }
+                    }
+                })
+            );
+        }, interval * Math.random());
     }
 }
