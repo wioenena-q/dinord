@@ -96,7 +96,6 @@
         "no-void": "off",
         "no-unused-expressions": "off",
         "no-return-await": "off",
-        "no-duplicate-imports": "off",
         "key-spacing": "off",
         "curly": "off",
         "nonblock-statement-body-position": "off",
