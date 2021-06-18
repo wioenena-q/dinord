@@ -103,6 +103,7 @@
         "prefer-const": "off",
         "no-plusplus": "off",
         "no-return-assign": "off",
-        "no-bitwise": "off"
+        "no-bitwise": "off",
+        "operator-linebreak": "off"
     }
 }
