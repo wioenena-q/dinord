@@ -48,7 +48,7 @@
         ],
         "brace-style": "error",
         "camelcase": "error",
-        "comma-dangle": "error",
+        "comma-dangle": "off",
         "comma-spacing": "error",
         "func-call-spacing": [
             "error",
@@ -104,6 +104,7 @@
         "no-return-assign": "off",
         "no-bitwise": "off",
         "operator-linebreak": "off",
-        "object-curly-newline": "off"
+        "object-curly-newline": "off",
+        "no-undef": "off"
     }
 }
