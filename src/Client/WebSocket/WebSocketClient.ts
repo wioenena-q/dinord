@@ -142,7 +142,7 @@ export class WebSocketClient extends EventEmitter {
         this.interval = setInterval(() => {
             this.socket.send(
                 JSON.stringify({
-                    op: 1,
+                    op: Constants.OPCodes.HEARTBEAT,
                     d: lastSeq
                 })
             );
@@ -150,7 +150,7 @@ export class WebSocketClient extends EventEmitter {
             if ("deepLogs" in this.client.getOptions) {
                 Util.Logger.debug("Sended heartbeat to API.");
             }
-        }, Math.floor(Math.random() * interval));
+        }, interval);
     }
 
     /**
@@ -161,7 +161,7 @@ export class WebSocketClient extends EventEmitter {
      */
     private identify() {
         this.socket.send(JSON.stringify({
-            op: 2,
+            op: Constants.OPCodes.IDENTIFY,
             d: {
                 token: this.client.getToken,
                 intents: 513,
