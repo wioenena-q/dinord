@@ -47,7 +47,7 @@ export class Client extends EventEmitter {
      */
     public constructor(options: IClientOptions = {}) {
         super();
-        this.options = { ...options };
+        this.options = { deepLogs: false, ...options };
 
         this.user = null;
         this.token = null;
@@ -85,6 +85,8 @@ export class Client extends EventEmitter {
     public get getWsClient() {
         return this.ws;
     }
+
+    public get getOptions() { return this.options; }
 
     public set setUser(user: ClientUser) {
         this.user = user;
