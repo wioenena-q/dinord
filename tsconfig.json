@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-        "noUnusedLocals": true,
         "noUnusedParameters": true,
         "importsNotUsedAsValues": "error"
     }
