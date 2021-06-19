@@ -160,20 +160,22 @@ export class WebSocketClient extends EventEmitter {
      * @memberof WebSocketClient
      */
     private identify() {
-        this.socket.send(
-            JSON.stringify({
-                op: 2,
-                d: {
-                    token: this.client.getToken,
-                    intents: 513,
-                    properties: {
-                        $os: Deno.build.os,
-                        $browser: "dinord",
-                        $device: "dinord"
-                    }
+        this.socket.send(JSON.stringify({
+            op: 2,
+            d: {
+                token: this.client.getToken,
+                intents: 513,
+                properties: {
+                    $os: Deno.build.os,
+                    $browser: "dinord",
+                    $device: "dinord"
                 }
-            })
-        );
+            }
+        }));
+    }
+
+    public destroy() {
+        clearInterval(this.interval);
     }
 
     public set setGuildSize(size: number) {
