@@ -1,6 +1,7 @@
 import { EventEmitter } from "../../deps.ts";
 import type { IClientOptions } from "../Types/IClientTypes.ts";
 import { WebSocketClient } from "./WebSocket/WebSocketClient.ts";
+import type { ClientUser } from "./ClientUser.ts";
 
 export class Client extends EventEmitter {
     /**
@@ -31,6 +32,15 @@ export class Client extends EventEmitter {
     private token: string | null | undefined = null;
 
     /**
+     *
+     * The user class for this client.
+     * @private
+     * @type {(ClientUser | null)}
+     * @memberof Client
+     */
+    private user: ClientUser | null;
+
+    /**
      * Creates an instance of Client.
      * @param {ClientOptions} [options]
      * @memberof Client
@@ -38,6 +48,9 @@ export class Client extends EventEmitter {
     public constructor(options: IClientOptions = {}) {
         super();
         this.options = { ...options };
+
+        this.user = null;
+        this.token = null;
 
         if ("token" in this.options) {
             this.token = this.options.token;
@@ -67,5 +80,13 @@ export class Client extends EventEmitter {
 
     public get getToken() {
         return this.token;
+    }
+
+    public get getWsClient() {
+        return this.ws;
+    }
+
+    public set setUser(user: ClientUser) {
+        this.user = user;
     }
 }
