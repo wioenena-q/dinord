@@ -24,7 +24,7 @@ export abstract class Base<T> {
      * @param {T} data
      * @memberof Base
      */
-    public constructor(client: Client, data: T) {
+    public constructor(client: Client) {
         this.client = client;
     }
 
