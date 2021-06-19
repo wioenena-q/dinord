@@ -47,7 +47,7 @@
             "always"
         ],
         "brace-style": "error",
-        "camelcase": "error",
+        "camelcase": "off",
         "comma-dangle": "off",
         "comma-spacing": "error",
         "func-call-spacing": [
