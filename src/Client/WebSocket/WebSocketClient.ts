@@ -3,6 +3,7 @@ import { EventEmitter } from "../../../deps.ts";
 import * as Constants from "../../Utils/Constants.ts";
 import { Client } from "../Client.ts";
 import type { IPayload } from "../../Types/IPayload.ts";
+import { Util } from "../../Utils/Util.ts";
 
 /**
  *
@@ -58,7 +59,9 @@ export class WebSocketClient extends EventEmitter {
      */
     public async connect() {
         await this.connectWebSocket(Constants.Discord.GATEWAY);
-        this.socket.onmessage = this.onMessage;
+        Util.Logger.info("Connected to WebSocket.");
+        this.emit("connectedWebSocket", this);
+        this.socket.onmessage = this.onMessage.bind(this);
     }
 
     /**
@@ -73,10 +76,20 @@ export class WebSocketClient extends EventEmitter {
         const { d, t, s, op } = data;
 
         let lastSeq = s;
-        // OP Code Hello.
-        if (op === Constants.OPCodes.HELLO) {
-            const { heartbeat_interval } = d as Record<string, unknown>;
-            this.heartbeat(heartbeat_interval as number);
+
+        switch (op) {
+            // Op Code hello.
+            case Constants.OPCodes.HELLO:
+                // eslint-disable-next-line no-case-declarations
+                const { heartbeat_interval } = d as Record<string, unknown>;
+                this.heartbeat(heartbeat_interval as number, lastSeq);
+                this.identify();
+                break;
+            case Constants.OPCodes.DISPATCH:
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -92,6 +105,8 @@ export class WebSocketClient extends EventEmitter {
         return new Promise<void>((res, rej) => {
             const socket: WebSocket = new WebSocket(url);
 
+            socket.onclose = (e) => console.log(e);
+
             socket.onopen = () => {
                 this.socket = socket;
                 res();
@@ -101,22 +116,31 @@ export class WebSocketClient extends EventEmitter {
         });
     }
 
-    private heartbeat(interval: number) {
+    private heartbeat(interval: number, lastSeq: number | null) {
         this.interval = setInterval(() => {
             this.socket.send(
                 JSON.stringify({
-                    op: 2,
-                    d: {
-                        token: this.client.getToken,
-                        intents: 513,
-                        properties: {
-                            $os: Deno.build.os,
-                            $browser: "dinord",
-                            $device: "dinord"
-                        }
-                    }
+                    op: 1,
+                    d: lastSeq
                 })
             );
-        }, interval * Math.random());
+        }, Math.floor(interval * Math.random()));
+    }
+
+    private identify() {
+        this.socket.send(
+            JSON.stringify({
+                op: 2,
+                d: {
+                    token: this.client.getToken,
+                    intents: 513,
+                    properties: {
+                        $os: Deno.build.os,
+                        $browser: "dinord",
+                        $device: "dinord"
+                    }
+                }
+            })
+        );
     }
 }
