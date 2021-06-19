@@ -76,10 +76,7 @@
         "no-duplicate-imports": "error",
         "no-var": "error",
         "no-unused-vars": "warn",
-        "indent": [
-            "error",
-            4
-        ],
+        "indent": "off",
         "no-shadow": "off",
         "import/prefer-default-export": "off",
         "import/extensions": "off",
