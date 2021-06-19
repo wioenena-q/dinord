@@ -65,7 +65,7 @@ export class WebSocketClient extends EventEmitter {
      * @memberof WebSocketClient
      */
     public async connect() {
-        await this.connectWebSocket(Constants.Discord.GATEWAY);
+        this.socket = await this.connectWebSocket(Constants.Discord.GATEWAY);
         Util.Logger.info("Connected to WebSocket.");
         this.emit("connectedWebSocket", this);
         this.socket.onmessage = this.onMessage.bind(this);
@@ -116,15 +116,14 @@ export class WebSocketClient extends EventEmitter {
      * @returns {Promise<WebSocket>}
      * @memberof WebSocketClient
      */
-    private connectWebSocket(url: string): Promise<void> {
-        return new Promise<void>((res, rej) => {
+    private connectWebSocket(url: string): Promise<WebSocket> {
+        return new Promise<WebSocket>((res, rej) => {
             const socket: WebSocket = new WebSocket(url);
 
             socket.onclose = (e) => console.log(e);
 
             socket.onopen = () => {
-                this.socket = socket;
-                res();
+                res(socket);
             };
 
             socket.onerror = rej;
@@ -147,7 +146,11 @@ export class WebSocketClient extends EventEmitter {
                     d: lastSeq
                 })
             );
-        }, Math.floor(interval * Math.random()));
+
+            if ("deepLogs" in this.client.getOptions) {
+                Util.Logger.debug("Sended heartbeat to API.");
+            }
+        }, Math.floor(Math.random() * interval));
     }
 
     /**
