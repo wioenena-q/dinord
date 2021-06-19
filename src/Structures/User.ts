@@ -45,4 +45,8 @@ export class User extends Base<IUser> {
         this.premiumType = data.premium_type;
         this.createdAt = new Date(Util.idToTimestamp(this.id));
     }
+
+    public get createdTimestamp() {
+        return this.createdAt.getTime();
+    }
 }
