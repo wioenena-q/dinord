@@ -40,6 +40,13 @@ export class WebSocketClient extends EventEmitter {
      */
     private client: Client;
 
+    /**
+     *
+     * The interval id.
+     * @private
+     * @type {number}
+     * @memberof WebSocketClient
+     */
     private interval!: number;
 
     /**
@@ -66,7 +73,7 @@ export class WebSocketClient extends EventEmitter {
 
     /**
      *
-     *
+     * The method to run when a message is received in the connection.
      * @private
      * @param {unknown} d
      * @memberof WebSocketClient
@@ -85,6 +92,7 @@ export class WebSocketClient extends EventEmitter {
                 this.heartbeat(heartbeat_interval as number, lastSeq);
                 this.identify();
                 break;
+
             // Op Code Dispatch. (event triggered.)
             case Constants.OPCodes.DISPATCH:
                 try {
@@ -102,7 +110,7 @@ export class WebSocketClient extends EventEmitter {
 
     /**
      *
-     *
+     * The method to basic connect to the API.
      * @private
      * @param {string} url
      * @returns {Promise<WebSocket>}
@@ -123,6 +131,14 @@ export class WebSocketClient extends EventEmitter {
         });
     }
 
+    /**
+     *
+     * Method to send heartbeat.
+     * @private
+     * @param {number} interval
+     * @param {(number | null)} lastSeq
+     * @memberof WebSocketClient
+     */
     private heartbeat(interval: number, lastSeq: number | null) {
         this.interval = setInterval(() => {
             this.socket.send(
@@ -134,6 +150,12 @@ export class WebSocketClient extends EventEmitter {
         }, Math.floor(interval * Math.random()));
     }
 
+    /**
+     *
+     * Method to send identify.
+     * @private
+     * @memberof WebSocketClient
+     */
     private identify() {
         this.socket.send(
             JSON.stringify({
@@ -149,5 +171,9 @@ export class WebSocketClient extends EventEmitter {
                 }
             })
         );
+    }
+
+    public set setGuildSize(size: number) {
+        this.guildSize = size;
     }
 }
