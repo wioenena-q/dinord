@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import { EventEmitter } from "../../../deps.ts";
 import * as Constants from "../../Utils/Constants.ts";
-import { Client } from "../Client.ts";
+import type { Client } from "../Client.ts";
 import type { IPayload } from "../../Types/IPayload.ts";
 import { Util } from "../../Utils/Util.ts";
 
