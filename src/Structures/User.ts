@@ -2,6 +2,7 @@ import { Base } from "./Base.ts";
 import type { IUser } from "../Types/StructureTypes.ts";
 import type { Client } from "../Client/Client.ts";
 import type { Snowflake } from "../Types/Snowflake.ts";
+import { Util } from "../Utils/Util.ts";
 
 export class User extends Base<IUser> {
     private id!: Snowflake;
@@ -24,6 +25,8 @@ export class User extends Base<IUser> {
 
     private premiumType!: number;
 
+    private createdAt!: Date;
+
     public constructor(client: Client, data: IUser) {
         super(client);
         this.patch(data);
@@ -40,5 +43,6 @@ export class User extends Base<IUser> {
         this.verified = data.verified || false;
         this.flags = data.flags;
         this.premiumType = data.premium_type;
+        this.createdAt = new Date(Util.idToTimestamp(this.id));
     }
 }
