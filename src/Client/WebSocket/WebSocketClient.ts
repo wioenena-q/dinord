@@ -71,7 +71,7 @@ export class WebSocketClient extends EventEmitter {
      * @param {unknown} d
      * @memberof WebSocketClient
      */
-    private onMessage(message: MessageEvent<string>) {
+    private async onMessage(message: MessageEvent<string>) {
         const data: IPayload = JSON.parse(message.data);
         const { d, t, s, op } = data;
 
@@ -85,7 +85,14 @@ export class WebSocketClient extends EventEmitter {
                 this.heartbeat(heartbeat_interval as number, lastSeq);
                 this.identify();
                 break;
+            // Op Code Dispatch. (event triggered.)
             case Constants.OPCodes.DISPATCH:
+                try {
+                    const { default: action } = await import(`./Actions/${t}.ts`);
+                    action(this.client, data);
+                } catch (e) {
+                    console.log(e);
+                }
                 break;
 
             default:
