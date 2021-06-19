@@ -1,6 +1,6 @@
 export enum Discord {
-    GATEWAY="wss://gateway.discord.gg/?v=9&encoding=json",
-    API="https://discord.com/api/v9"
+    GATEWAY = "wss://gateway.discord.gg/?v=9&encoding=json",
+    API = "https://discord.com/api/v9"
 }
 
 export enum OPCodes {
@@ -8,8 +8,8 @@ export enum OPCodes {
     HEARTBEAT,
     IDENTIFY,
     PRESENCE_UPDATE,
-    VOICE_STATE_UPDATE,
-    RESUME,
+    VOICE_STATE_UPDATE = 4,
+    RESUME = 6,
     RECONNECT,
     REQUEST_GUILD_MEMBERS,
     INVALID_SESSION,
