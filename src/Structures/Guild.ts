@@ -5,6 +5,7 @@ import type { Snowflake } from "../Types/Snowflake.ts";
 import { Util } from "../Utils/Util.ts";
 import { Collection } from "../../deps.ts";
 import { Role } from "./Role.ts";
+import { GuildEmoji } from "./GuildEmoji.ts";
 
 /**
  *
@@ -48,7 +49,7 @@ export class Guild extends Base<GuildData> {
 
     private roles = new Collection<Snowflake, Role>();
 
-    private emojis!: unknown;
+    private emojis = new Collection<Snowflake, GuildEmoji>();
 
     private features!: unknown;
 
@@ -161,6 +162,17 @@ export class Guild extends Base<GuildData> {
             }
         }
 
-        console.log(this.roles);
+        if ("emojis" in data) {
+            this.emojis.clear();
+
+            for (const emojiData of data.emojis) {
+                const emoji = new GuildEmoji(this.client, this, emojiData);
+                this.emojis.set(emoji.getID, emoji);
+            }
+        }
+
+        console.log(this.emojis);
     }
+
+    public get getRoles() { return this.roles; }
 }
