@@ -1,17 +1,25 @@
-import type { Snowflake } from "./Snowflake.ts";
+import { Snowflake } from "./Snowflake.ts";
+import { UserData } from "./UserTypes.ts";
 
-export interface UserData {
-    id: Snowflake;
-    username: string;
-    discriminator: string;
-    avatar?: string | null;
-    bot: boolean;
-    system: boolean;
-    mfa_enabled: boolean;
-    verified: boolean;
-    flags: number;
-    premium_type: number;
-}
+export type GuildFeatures =
+    "ANIMATED_ICON" |
+    "BANNER" |
+    "COMMERCE" |
+    "COMMUNITY" |
+    "DISCOVERABLE" |
+    "FEATURABLE" |
+    "INVITE_SPLASH" |
+    "MEMBER_VERIFICATION_GATE_ENABLED" |
+    "NEWS" |
+    "PARTNERED" |
+    "PREVIEW_ENABLED" |
+    "VANITY_URL" |
+    "VERIFIED" |
+    "VIP_REGIONS" |
+    "WELCOME_SCREEN_ENABLED" |
+    "TICKETED_EVENTS_ENABLED" |
+    "MONETIZATION_ENABLED" |
+    "MORE_STICKERS"
 
 export interface GuildData {
     id: Snowflake;
@@ -31,7 +39,7 @@ export interface GuildData {
     explicit_content_filter: number;
     roles: GuildRoleData[];
     emojis: GuildEmojiData[];
-    features: string[];
+    features: GuildFeatures[];
     mfa_level: number;
     application_id?: Snowflake;
     system_channel_id?: Snowflake;
