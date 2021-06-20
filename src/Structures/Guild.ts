@@ -6,6 +6,7 @@ import { Util } from "../Utils/Util.ts";
 import { Collection } from "../../deps.ts";
 import { Role } from "./Role.ts";
 import { GuildEmoji } from "./GuildEmoji.ts";
+import { VoiceState } from "./VoiceState.ts";
 
 /**
  *
@@ -69,7 +70,7 @@ export class Guild extends Base<GuildData> {
 
     private memberCount!: number;
 
-    private voiceStates!: unknown;
+    private voiceStates = new Collection<Snowflake, VoiceState>();
 
     private members!: unknown;
 
@@ -164,6 +165,7 @@ export class Guild extends Base<GuildData> {
         }
 
         if ("emojis" in data) {
+            // Delete this guild's 'emojis' cache.
             this.emojis.clear();
 
             for (const emojiData of data.emojis) {
@@ -172,7 +174,17 @@ export class Guild extends Base<GuildData> {
             }
         }
 
-        console.log(this.features);
+        if ("voice_states" in data) {
+            // Delete this guild 'voiceStates' cache.
+            this.voiceStates.clear();
+
+            for (const voiceStateData of data.voice_states) {
+                const voiceState = new VoiceState(this.client, voiceStateData);
+                this.voiceStates.set(voiceState.getUserID, voiceState);
+            }
+        }
+
+        console.log(this.voiceStates);
     }
 
     public get getRoles() { return this.roles; }
