@@ -53,9 +53,9 @@ export interface GuildData {
     premium_subscription_count: number;
     preferred_locale: string;
     max_video_channel_users: number;
-    approximate_member_count: number;
-    approximate_presence_count: number;
-    nsfw_level: number;
+    approximate_member_count?: number;
+    approximate_presence_count?: number;
+    nsfw_level?: number;
 }
 
 export interface GuildRoleData { }
