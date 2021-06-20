@@ -1,10 +1,10 @@
 import { Base } from "./Base.ts";
-import type { IUser } from "../Types/StructureTypes.ts";
+import type { UserData } from "../Types/StructureTypes.ts";
 import type { Client } from "../Client/Client.ts";
 import type { Snowflake } from "../Types/Snowflake.ts";
 import { Util } from "../Utils/Util.ts";
 
-export class User extends Base<IUser> {
+export class User extends Base<UserData> {
     private id!: Snowflake;
 
     private username!: string;
@@ -27,12 +27,12 @@ export class User extends Base<IUser> {
 
     private createdAt!: Date;
 
-    public constructor(client: Client, data: IUser) {
+    public constructor(client: Client, data: UserData) {
         super(client);
         this.patch(data);
     }
 
-    protected patch(data: IUser): void {
+    protected patch(data: UserData): void {
         this.id = data.id;
         this.username = data.username;
         this.discriminator = data.discriminator;
