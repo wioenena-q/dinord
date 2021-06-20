@@ -103,6 +103,16 @@ export interface GuildVoiceStateData {
     self_video: boolean;
     self_stream?: boolean;
 }
-export interface GuildMemberData { }
+export interface GuildMemberData {
+    id: Snowflake;
+    user: UserData;
+    nick?: string;
+    roles: Snowflake[];
+    joined_at: number;
+    premium_since?: number;
+    deaf: boolean;
+    mute: boolean;
+    permissions: string;
+}
 export interface GuildChannelData { }
 export interface GuildPresenceData { }
