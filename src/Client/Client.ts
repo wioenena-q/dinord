@@ -1,5 +1,5 @@
 import { EventEmitter, Collection } from "../../deps.ts";
-import type { IClientOptions } from "../Types/IClientTypes.ts";
+import type { IClientOptions } from "../Types/ClientTypes.ts";
 import { WebSocketClient } from "./WebSocket/WebSocketClient.ts";
 import type { ClientUser } from "./ClientUser.ts";
 import type { User } from "../Structures/User.ts";
