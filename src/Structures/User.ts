@@ -56,4 +56,6 @@ export class User extends Base<UserData> {
     public get createdTimestamp() {
         return this.createdAt.getTime();
     }
+
+    public get getID() { return this.id; }
 }
