@@ -31,7 +31,7 @@ export class GuildMember extends Base<GuildMemberData> {
     }
 
     protected patch(data: GuildMemberData): void {
-        this.nickname = "nick" in data ? data.nick : null;
+        this.nickname = (data.nick !== undefined && data.nick !== null) ? data.nick : null;
         this._roles = data.roles;
         this.joinedAt = new Date(data.joined_at);
         this.premiumSince = "premium_since" in data ? new Date(data.premium_since!) : null;
