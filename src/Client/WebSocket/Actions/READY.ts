@@ -6,7 +6,7 @@ import type { UserData } from "../../../Types/StructureTypes.ts";
 export default function (client: Client, { d }: IPayload) {
     client.setUser = new ClientUser(client, (d as Record<string, unknown>).user as UserData);
 
-    client.getWsClient.setGuildSize = (d as any).guilds.length;
+    const { guilds } = d as Record<string, unknown>;
 
-    console.log(client);
+    client.getWsClient.setGuildSize = (guilds as unknown[]).length;
 }
