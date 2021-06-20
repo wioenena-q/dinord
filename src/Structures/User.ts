@@ -4,8 +4,15 @@ import type { Client } from "../Client/Client.ts";
 import type { Snowflake } from "../Types/Snowflake.ts";
 import { Util } from "../Utils/Util.ts";
 
+/**
+ *
+ * The User structure for discord users.
+ * @export
+ * @class User
+ * @extends {Base<UserData>}
+ */
 export class User extends Base<UserData> {
-    private id!: Snowflake;
+    private id: Snowflake;
 
     private username!: string;
 
@@ -29,11 +36,11 @@ export class User extends Base<UserData> {
 
     public constructor(client: Client, data: UserData) {
         super(client);
+        this.id = data.id;
         this.patch(data);
     }
 
     protected patch(data: UserData): void {
-        this.id = data.id;
         this.username = data.username;
         this.discriminator = data.discriminator;
         this.avatar = data.avatar || null;
