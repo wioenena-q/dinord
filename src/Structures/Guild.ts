@@ -1,5 +1,5 @@
 import { Base } from "./Base.ts";
-import type { GuildData } from "../Types/StructureTypes.ts";
+import type { GuildData, GuildFeatures } from "../Types/GuildTypes.ts";
 import type { Client } from "../Client/Client.ts";
 import type { Snowflake } from "../Types/Snowflake.ts";
 import { Util } from "../Utils/Util.ts";
@@ -51,7 +51,7 @@ export class Guild extends Base<GuildData> {
 
     private emojis = new Collection<Snowflake, GuildEmoji>();
 
-    private features!: unknown;
+    private features!: GuildFeatures[];
 
     private mfaLevel!: number;
 
@@ -151,6 +151,7 @@ export class Guild extends Base<GuildData> {
         this.approximatePresenceCount = "approximate_presence_count" in data ? data.approximate_presence_count! : null;
         this.nsfwLevel = "nsfw_level" in data ? data.nsfw_level! : null;
         this.createdAt = new Date(Util.idToTimestamp(this.id));
+        this.features = data.features;
 
         if ("roles" in data) {
             // Delete this guild's 'roles' cache.
@@ -170,8 +171,6 @@ export class Guild extends Base<GuildData> {
                 this.emojis.set(emoji.getID, emoji);
             }
         }
-
-        console.log(this.emojis);
     }
 
     public get getRoles() { return this.roles; }
