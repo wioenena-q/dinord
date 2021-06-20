@@ -101,6 +101,8 @@ export class Guild extends Base<GuildData> {
     public constructor(client: Client, data: GuildData) {
         super(client);
 
+        this.id = data.id;
+
         this.available = !data.unavailable;
 
         if (this.available) {
@@ -109,7 +111,6 @@ export class Guild extends Base<GuildData> {
     }
 
     protected patch(data: GuildData): void {
-        this.id = data.id;
         this.name = data.name;
         this.icon = data.icon || null;
         this.iconHash = data.icon_hash || null;
