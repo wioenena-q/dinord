@@ -12,11 +12,11 @@ export abstract class Base<T> {
     /**
      *
      *
-     * @private
+     * @
      * @type {Client}
      * @memberof Base
      */
-    private client: Client
+    protected client: Client
 
     /**
      * Creates an instance of Base.
