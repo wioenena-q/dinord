@@ -175,7 +175,7 @@ export class Guild extends Base<GuildData> {
         }
 
         if ("voice_states" in data) {
-            // Delete this guild 'voiceStates' cache.
+            // Delete this guild's 'voiceStates' cache.
             this.voiceStates.clear();
 
             for (const voiceStateData of data.voice_states) {
@@ -183,8 +183,6 @@ export class Guild extends Base<GuildData> {
                 this.voiceStates.set(voiceState.getUserID, voiceState);
             }
         }
-
-        console.log(this.voiceStates);
     }
 
     public get getRoles() { return this.roles; }
