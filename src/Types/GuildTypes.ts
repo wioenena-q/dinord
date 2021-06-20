@@ -90,7 +90,19 @@ export interface GuildEmojiData extends BaseEmoji {
     available: boolean;
 }
 
-export interface GuildVoiceStateData { }
+export interface GuildVoiceStateData {
+    guild_id: Snowflake;
+    channel_id?: Snowflake;
+    user_id: Snowflake;
+    member: GuildMemberData;
+    session_id: string;
+    deaf: boolean;
+    mute: boolean;
+    self_deaf: boolean;
+    self_mute: boolean;
+    self_video: boolean;
+    self_stream?: boolean;
+}
 export interface GuildMemberData { }
 export interface GuildChannelData { }
 export interface GuildPresenceData { }
