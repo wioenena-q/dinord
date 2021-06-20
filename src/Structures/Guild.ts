@@ -18,25 +18,25 @@ export class Guild extends Base<GuildData> {
 
     private available: boolean;
 
-    private icon!: string | null;
+    private icon?: string | null;
 
-    private iconHash!: string | null;
+    private iconHash?: string | null;
 
-    private splash!: string | null;
+    private splash?: string | null;
 
-    private discoverySplash!: string | null;
+    private discoverySplash?: string | null;
 
     private ownerID!: Snowflake;
 
-    private region!: string | null;
+    private region?: string | null;
 
-    private afkChannelID!: Snowflake | null;
+    private afkChannelID?: Snowflake | null;
 
     private afkTimeout!: number
 
     private widgetEnabled!: boolean;
 
-    private widgetChannelID!: Snowflake | null;
+    private widgetChannelID?: Snowflake | null;
 
     private verificationLevel!: number;
 
@@ -52,13 +52,13 @@ export class Guild extends Base<GuildData> {
 
     private mfaLevel!: number;
 
-    private applicationID!: Snowflake | null;
+    private applicationID?: Snowflake | null;
 
-    private systemChannelID!: Snowflake | null;
+    private systemChannelID?: Snowflake | null;
 
     private systemChannelFlags!: number;
 
-    private rulesChannelID!: Snowflake | null;
+    private rulesChannelID?: Snowflake | null;
 
     private joinedAt!: Date;
 
@@ -74,15 +74,15 @@ export class Guild extends Base<GuildData> {
 
     private presences!: unknown;
 
-    private maxPresences!: number | null;
+    private maxPresences?: number | null;
 
     private maxMembers!: number;
 
-    private vanityURLCode!: string | null;
+    private vanityURLCode?: string | null;
 
-    private description!: string | null;
+    private description?: string | null;
 
-    private banner!: string | null;
+    private banner?: string | null;
 
     private premiumTier!: number;
 
@@ -92,11 +92,11 @@ export class Guild extends Base<GuildData> {
 
     private maxVideoChannelUsers!: number;
 
-    private approximateMemberCount!: number | null;
+    private approximateMemberCount?: number | null;
 
-    private approximatePresenceCount!: number | null;
+    private approximatePresenceCount?: number | null;
 
-    private nsfwLevel!: number | null;
+    private nsfwLevel?: number | null;
 
     public constructor(client: Client, data: GuildData) {
         super(client);
@@ -125,7 +125,6 @@ export class Guild extends Base<GuildData> {
         this.verificationLevel = data.verification_level;
         this.defaultMessageNotifications = data.default_message_notifications;
         this.explicitContentFilter = data.explicit_content_filter;
-
         this.mfaLevel = data.mfa_level;
         this.applicationID = data.application_id || null;
         this.systemChannelID = data.system_channel_id || null;
