@@ -171,6 +171,8 @@ export class Guild extends Base<GuildData> {
                 this.emojis.set(emoji.getID, emoji);
             }
         }
+
+        console.log(this.features);
     }
 
     public get getRoles() { return this.roles; }

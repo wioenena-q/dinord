@@ -1,7 +1,7 @@
 import { BaseEmoji } from "./BaseEmoji.ts";
 import type { Snowflake } from "../Types/Snowflake.ts";
 import type { Client } from "../Client/Client.ts";
-import type { GuildEmojiData } from "../Types/StructureTypes.ts";
+import type { GuildEmojiData } from "../Types/GuildTypes.ts";
 import type { Role } from "./Role.ts";
 import type { Guild } from "./Guild.ts";
 import { Collection } from "../../deps.ts";

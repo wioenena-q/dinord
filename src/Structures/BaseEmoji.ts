@@ -1,5 +1,5 @@
 import { Base } from "./Base.ts";
-import type { BaseEmoji as IBaseEmoji } from "../Types/StructureTypes.ts";
+import type { BaseEmoji as IBaseEmoji } from "../Types/GuildTypes.ts";
 import type { Client } from "../Client/Client.ts";
 
 /**

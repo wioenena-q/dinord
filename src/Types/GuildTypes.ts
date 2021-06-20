@@ -1,5 +1,5 @@
-import { Snowflake } from "./Snowflake.ts";
-import { UserData } from "./UserTypes.ts";
+import type { Snowflake } from "./Snowflake.ts";
+import type { UserData } from "./UserTypes.ts";
 
 export type GuildFeatures =
     "ANIMATED_ICON" |

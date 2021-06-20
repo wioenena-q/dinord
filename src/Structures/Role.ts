@@ -1,5 +1,5 @@
 import { Base } from "./Base.ts";
-import type { GuildRoleData } from "../Types/StructureTypes.ts";
+import type { GuildRoleData } from "../Types/GuildTypes.ts";
 import type { Client } from "../Client/Client.ts";
 import type { Snowflake } from "../Types/Snowflake.ts";
 import { Util } from "../Utils/Util.ts";
