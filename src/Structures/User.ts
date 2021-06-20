@@ -1,5 +1,5 @@
 import { Base } from "./Base.ts";
-import type { UserData } from "../Types/StructureTypes.ts";
+import type { UserData } from "../Types/UserTypes.ts";
 import type { Client } from "../Client/Client.ts";
 import type { Snowflake } from "../Types/Snowflake.ts";
 import { Util } from "../Utils/Util.ts";
