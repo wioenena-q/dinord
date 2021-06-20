@@ -69,7 +69,18 @@ export interface GuildRoleData {
     mentionable: boolean;
 }
 
-export interface GuildEmojiData { }
+export interface BaseEmoji {
+    name?: string;
+}
+
+export interface GuildEmojiData extends BaseEmoji {
+    id: Snowflake;
+    roles: Snowflake[];
+    user: UserData;
+    managed: boolean;
+    animated: boolean;
+    available: boolean;
+}
 
 export interface GuildVoiceStateData { }
 export interface GuildMemberData { }
