@@ -1,7 +1,9 @@
-import { EventEmitter } from "../../deps.ts";
+import { EventEmitter, Collection } from "../../deps.ts";
 import type { IClientOptions } from "../Types/IClientTypes.ts";
 import { WebSocketClient } from "./WebSocket/WebSocketClient.ts";
 import type { ClientUser } from "./ClientUser.ts";
+import type { User } from "../Structures/User.ts";
+import type { Snowflake } from "../Types/Snowflake.ts";
 
 export class Client extends EventEmitter {
     /**
@@ -41,6 +43,14 @@ export class Client extends EventEmitter {
     private user: ClientUser | null;
 
     /**
+     *
+     * The users cache for client.
+     * @private
+     * @memberof Client
+     */
+    private users = new Collection<Snowflake, User>();
+
+    /**
      * Creates an instance of Client.
      * @param {ClientOptions} [options]
      * @memberof Client
@@ -78,15 +88,13 @@ export class Client extends EventEmitter {
         await this.ws.connect();
     }
 
-    public get getToken() {
-        return this.token;
-    }
+    public get getToken() { return this.token; }
 
-    public get getWsClient() {
-        return this.ws;
-    }
+    public get getWsClient() { return this.ws; }
 
     public get getOptions() { return this.options; }
+
+    public get getUsers() { return this.users; }
 
     public set setUser(user: ClientUser) {
         this.user = user;
