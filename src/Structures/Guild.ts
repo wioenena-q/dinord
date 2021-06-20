@@ -3,6 +3,8 @@ import type { GuildData } from "../Types/StructureTypes.ts";
 import type { Client } from "../Client/Client.ts";
 import type { Snowflake } from "../Types/Snowflake.ts";
 import { Util } from "../Utils/Util.ts";
+import { Collection } from "../../deps.ts";
+import { Role } from "./Role.ts";
 
 /**
  *
@@ -44,7 +46,7 @@ export class Guild extends Base<GuildData> {
 
     private explicitContentFilter!: number;
 
-    private roles!: unknown;
+    private roles = new Collection<Snowflake, Role>();
 
     private emojis!: unknown;
 
@@ -98,6 +100,8 @@ export class Guild extends Base<GuildData> {
 
     private nsfwLevel?: number | null;
 
+    private createdAt!: Date;
+
     public constructor(client: Client, data: GuildData) {
         super(client);
 
@@ -145,6 +149,18 @@ export class Guild extends Base<GuildData> {
         this.approximateMemberCount = "approximate_member_count" in data ? data.approximate_member_count! : null;
         this.approximatePresenceCount = "approximate_presence_count" in data ? data.approximate_presence_count! : null;
         this.nsfwLevel = "nsfw_level" in data ? data.nsfw_level! : null;
-        console.log(this);
+        this.createdAt = new Date(Util.idToTimestamp(this.id));
+
+        if ("roles" in data) {
+            // Delete this guild's 'roles' cache.
+            this.roles.clear();
+
+            for (const roleData of data.roles) {
+                const role = new Role(this.client, roleData);
+                this.roles.set(role.getID, role);
+            }
+        }
+
+        console.log(this.roles);
     }
 }
