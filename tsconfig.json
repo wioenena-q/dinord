@@ -2,5 +2,9 @@
     "compilerOptions": {
         "noUnusedParameters": true,
         "importsNotUsedAsValues": "error"
-    }
+    },
+    "include": [
+        "src/**/*",
+        "tests/**/*"
+    ]
 }
