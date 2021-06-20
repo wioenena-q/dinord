@@ -7,6 +7,7 @@ import { Collection } from "../../deps.ts";
 import { Role } from "./Role.ts";
 import { GuildEmoji } from "./GuildEmoji.ts";
 import { VoiceState } from "./VoiceState.ts";
+import { GuildMember } from "./GuildMember.ts";
 
 /**
  *
@@ -72,7 +73,7 @@ export class Guild extends Base<GuildData> {
 
     private voiceStates = new Collection<Snowflake, VoiceState>();
 
-    private members!: unknown;
+    private members = new Collection<Snowflake, GuildMember>();
 
     private channels!: unknown;
 
@@ -148,9 +149,9 @@ export class Guild extends Base<GuildData> {
         this.premiumSubscriptionCount = data.premium_subscription_count;
         this.preferredLocale = data.preferred_locale;
         this.maxVideoChannelUsers = data.max_video_channel_users;
-        this.approximateMemberCount = "approximate_member_count" in data ? data.approximate_member_count! : null;
-        this.approximatePresenceCount = "approximate_presence_count" in data ? data.approximate_presence_count! : null;
-        this.nsfwLevel = "nsfw_level" in data ? data.nsfw_level! : null;
+        this.approximateMemberCount = "approximate_member_count" in data ? data.approximate_member_count : null;
+        this.approximatePresenceCount = "approximate_presence_count" in data ? data.approximate_presence_count : null;
+        this.nsfwLevel = "nsfw_level" in data ? data.nsfw_level : null;
         this.createdAt = new Date(Util.idToTimestamp(this.id));
         this.features = data.features;
 
@@ -181,6 +182,16 @@ export class Guild extends Base<GuildData> {
             for (const voiceStateData of data.voice_states) {
                 const voiceState = new VoiceState(this.client, voiceStateData);
                 this.voiceStates.set(voiceState.getUserID, voiceState);
+            }
+        }
+
+        if ("members" in data) {
+            // Delete this guild's 'members' cache.
+            this.members.clear();
+
+            for (const memberData of data.members) {
+                const member = new GuildMember(this.client, this, memberData);
+                this.members.set(member.getID, member);
             }
         }
     }
