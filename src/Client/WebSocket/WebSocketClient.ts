@@ -164,7 +164,7 @@ export class WebSocketClient extends EventEmitter {
             op: Constants.OPCodes.IDENTIFY,
             d: {
                 token: this.client.getToken,
-                intents: 513,
+                intents: 32767,
                 properties: {
                     $os: Deno.build.os,
                     $browser: "dinord",
