@@ -1,5 +1,6 @@
 import type { Snowflake } from "./Snowflake.ts";
 import type { UserData } from "./UserTypes.ts";
+import { BaseChannelData, BaseTextChannelData } from "./ChannelTypes.ts";
 
 export type GuildFeatures =
     "ANIMATED_ICON" |
@@ -51,7 +52,7 @@ export interface GuildData {
     member_count: number;
     voice_states: GuildVoiceStateData[];
     members: GuildMemberData[];
-    channels: GuildChannelData[];
+    channels: unknown;
     max_presences?: number;
     max_members: number;
     vanity_url_code?: string;
@@ -114,5 +115,34 @@ export interface GuildMemberData {
     mute: boolean;
     permissions: string;
 }
-export interface GuildChannelData { }
+
+
+export interface BaseGuildChannelData extends BaseChannelData {
+    name: string;
+    guild_id: Snowflake;
+    parent_id?: Snowflake;
+    position: number;
+    permission_overwrites: unknown[];
+    nsfw: boolean;
+}
+
+export interface GuildTextChannelData extends BaseGuildChannelData {
+    rate_limit_per_user: number;
+    topic?: string;
+    last_message_id?: Snowflake;
+}
+export interface GuildVoiceChannelData extends BaseGuildChannelData {
+    bitrate: number;
+    user_limit: number;
+    rtc_region?: string;
+}
+
+
+// Some interfaces were created for logical types, I know that they are empty.
+export interface GuildCategoryChannelData extends BaseGuildChannelData { }
+
+export interface GuildStoreChannelData extends BaseGuildChannelData { }
+
+export interface GuildNewsChannelData extends GuildTextChannelData { }
+
 export interface GuildPresenceData { }
