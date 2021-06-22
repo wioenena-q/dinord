@@ -1,6 +1,7 @@
 import { GuildChannel } from "./GuildChannel.ts";
 import type { Client } from "../Client/Client.ts";
 import type { GuildVoiceChannelData } from "../Types/GuildTypes.ts";
+import type { Guild } from "./Guild.ts";
 
 export class GuildVoiceChannel extends GuildChannel {
     private bitrate!: number;
@@ -9,8 +10,8 @@ export class GuildVoiceChannel extends GuildChannel {
 
     private rtcRegion?: string | null;
 
-    public constructor(client: Client, data: GuildVoiceChannelData) {
-        super(client, data);
+    public constructor(client: Client, guild: Guild, data: GuildVoiceChannelData) {
+        super(client, guild, data);
         this.patch(data);
     }
 

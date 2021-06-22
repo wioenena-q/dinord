@@ -2,6 +2,7 @@ import { GuildChannel } from "./GuildChannel.ts";
 import type { Client } from "../Client/Client.ts";
 import type { GuildTextChannelData } from "../Types/GuildTypes.ts";
 import type { Snowflake } from "../Types/Snowflake.ts";
+import type { Guild } from "./Guild.ts";
 
 export class GuildTextChannel extends GuildChannel {
     private topic?: string | null;
@@ -10,8 +11,8 @@ export class GuildTextChannel extends GuildChannel {
 
     private lastMessageID?: Snowflake | null;
 
-    public constructor(client: Client, data: GuildTextChannelData) {
-        super(client, data);
+    public constructor(client: Client, guild: Guild, data: GuildTextChannelData) {
+        super(client, guild, data);
         this.patch(data);
     }
 
