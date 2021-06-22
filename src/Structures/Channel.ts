@@ -12,6 +12,7 @@ import type { BaseChannelData } from "../Types/ChannelTypes.ts";
  */
 export class Channel<T> extends Base<BaseChannelData> {
     private id: Snowflake;
+
     private type!: number;
 
     public constructor(client: Client, data: BaseChannelData) {

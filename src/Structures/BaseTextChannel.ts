@@ -12,6 +12,7 @@ import type { Client } from "../Client/Client.ts";
  */
 export class BaseTextChannel extends Channel<BaseTextChannelData> {
     private lastMessageID?: Snowflake | null;
+
     public constructor(client: Client, data: BaseTextChannelData) {
         super(client, data);
         this.patch(data);

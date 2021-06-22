@@ -20,4 +20,3 @@ export interface GroupDMChannelData extends DMChannelData {
     icon?: string;
     owner_id: Snowflake;
 }
-
