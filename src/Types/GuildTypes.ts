@@ -141,6 +141,6 @@ export interface GuildCategoryChannelData extends BaseGuildChannelData { }
 
 export interface GuildStoreChannelData extends BaseGuildChannelData { }
 
-export interface GuildNewsChannelData extends GuildTextChannelData { }
+export interface GuildNewsChannelData extends Omit<GuildTextChannelData, "rate_limit_per_user"> { }
 
 export interface GuildPresenceData { }
