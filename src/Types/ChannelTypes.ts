@@ -7,11 +7,10 @@ export interface BaseChannelData {
 }
 
 export interface BaseTextChannelData extends BaseChannelData {
-    name: string;
     last_message_id?: Snowflake;
 }
 
-export interface DMChannelData extends Omit<BaseTextChannelData, "name"> {
+export interface DMChannelData extends BaseTextChannelData {
     recipients: UserData[];
 }
 
