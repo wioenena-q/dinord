@@ -1,6 +1,6 @@
 import type { Snowflake } from "./Snowflake.ts";
 import type { UserData } from "./UserTypes.ts";
-import { BaseChannelData, BaseTextChannelData } from "./ChannelTypes.ts";
+import type { BaseChannelData } from "./ChannelTypes.ts";
 
 export type GuildFeatures =
     "ANIMATED_ICON" |
@@ -52,7 +52,7 @@ export interface GuildData {
     member_count: number;
     voice_states: GuildVoiceStateData[];
     members: GuildMemberData[];
-    channels: unknown;
+    channels: GuildChannelData[];
     max_presences?: number;
     max_members: number;
     vanity_url_code?: string;
@@ -144,3 +144,5 @@ export interface GuildStoreChannelData extends BaseGuildChannelData { }
 export interface GuildNewsChannelData extends Omit<GuildTextChannelData, "rate_limit_per_user"> { }
 
 export interface GuildPresenceData { }
+
+export type GuildChannelData = BaseGuildChannelData | GuildTextChannelData | GuildVoiceChannelData | GuildCategoryChannelData | GuildNewsChannelData | GuildStoreChannelData;
