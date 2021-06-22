@@ -6,6 +6,9 @@
     "type": "git",
     "url": "git+https://github.com/wioenena-q/dinord.git"
   },
+  "scripts": {
+    "eslint": "eslint"
+  },
   "keywords": [],
   "author": "wioenena",
   "license": "MIT",
