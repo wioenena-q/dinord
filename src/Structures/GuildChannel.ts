@@ -31,4 +31,8 @@ export class GuildChannel extends Channel<BaseGuildChannelData> {
         this.permissionOverwrites = data.permission_overwrites;
         this.position = data.position;
     }
+
+    public get getParentID() { return this.parentID; }
+
+    public get getGuild() { return this.guild; }
 }

@@ -8,4 +8,8 @@ export class GuildCategoryChannel extends GuildChannel {
         super(client, guild, data);
         this.patch(data);
     }
+
+    public get childrens() {
+        return this.getGuild.getChannels.filter((channel) => channel.getParentID === this.getID);
+    }
 }

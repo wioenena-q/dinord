@@ -241,10 +241,10 @@ export class Guild extends Base<GuildData> {
                 if (typeof channel !== "undefined")
                     this.channels.set(channel.getID, channel!);
             }
-
-            console.log(this.channels);
         }
     }
 
     public get getRoles() { return this.roles; }
+
+    public get getChannels() { return this.channels; }
 }
