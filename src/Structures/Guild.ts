@@ -1,5 +1,13 @@
 import { Base } from "./Base.ts";
-import type { GuildData, GuildFeatures } from "../Types/GuildTypes.ts";
+import type {
+    GuildData,
+    GuildFeatures,
+    GuildTextChannelData,
+    GuildVoiceChannelData,
+    GuildCategoryChannelData,
+    GuildNewsChannelData,
+    GuildStoreChannelData
+} from "../Types/GuildTypes.ts";
 import type { Client } from "../Client/Client.ts";
 import type { Snowflake } from "../Types/Snowflake.ts";
 import { Util } from "../Utils/Util.ts";
@@ -8,6 +16,12 @@ import { Role } from "./Role.ts";
 import { GuildEmoji } from "./GuildEmoji.ts";
 import { VoiceState } from "./VoiceState.ts";
 import { GuildMember } from "./GuildMember.ts";
+import type { GuildChannel } from "./GuildChannel.ts";
+import { GuildTextChannel } from "./GuildTextChannel.ts";
+import { GuildVoiceChannel } from "./GuildVoiceChannel.ts";
+import { GuildCategoryChannel } from "./GuildCategoryChannel.ts";
+import { GuildNewsChannel } from "./GuildNewsChannel.ts";
+import { GuildStoreChannel } from "./GuildStoreChannel.ts";
 
 /**
  *
@@ -75,7 +89,7 @@ export class Guild extends Base<GuildData> {
 
     private members = new Collection<Snowflake, GuildMember>();
 
-    private channels!: unknown;
+    private channels = new Collection<Snowflake, GuildChannel>();
 
     private presences!: unknown;
 
@@ -111,6 +125,10 @@ export class Guild extends Base<GuildData> {
         this.id = data.id;
 
         this.available = !data.unavailable;
+
+        if (!("channels" in data)) {
+            this.available = false;
+        }
 
         if (this.available) {
             this.patch(data);
@@ -193,6 +211,38 @@ export class Guild extends Base<GuildData> {
                 const member = new GuildMember(this.client, this, memberData);
                 this.members.set(member.getID, member);
             }
+        }
+
+        if ("channels" in data) {
+            // Delete this guild's 'channels' cache.
+            this.channels.clear();
+
+            for (const channelData of data.channels) {
+                let channel: GuildChannel | undefined;
+
+                // eslint-disable-next-line default-case
+                switch (channelData.type) {
+                    case 0:
+                        channel = new GuildTextChannel(this.client, this, channelData as GuildTextChannelData);
+                        break;
+                    case 2:
+                        channel = new GuildVoiceChannel(this.client, this, channelData as GuildVoiceChannelData);
+                        break;
+                    case 4:
+                        channel = new GuildCategoryChannel(this.client, this, channelData as GuildCategoryChannelData);
+                        break;
+                    case 5:
+                        channel = new GuildNewsChannel(this.client, this, channelData as GuildNewsChannelData);
+                        break;
+                    case 6:
+                        channel = new GuildStoreChannel(this.client, this, channelData as GuildStoreChannelData);
+                        break;
+                }
+                if (typeof channel !== "undefined")
+                    this.channels.set(channel.getID, channel!);
+            }
+
+            console.log(this.channels);
         }
     }
 
