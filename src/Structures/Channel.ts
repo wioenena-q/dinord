@@ -9,8 +9,9 @@ import type { BaseChannelData } from "../Types/ChannelTypes.ts";
  * @export
  * @class Channel
  * @extends {Base<BaseChannelData>}
+ * @template _T
  */
-export class Channel<T> extends Base<BaseChannelData> {
+export class Channel<_T> extends Base<BaseChannelData> {
     private id: Snowflake;
 
     private type!: number;
@@ -21,5 +22,7 @@ export class Channel<T> extends Base<BaseChannelData> {
         this.type = data.type;
     }
 
-    protected patch(data: unknown) { }
+    protected patch(_: unknown) { }
+
+    public get getID() { return this.id; }
 }
