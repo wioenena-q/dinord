@@ -92,7 +92,7 @@ export class Guild extends Base<GuildData> {
 
     private channels = new Collection<Snowflake, GuildChannel>();
 
-    private presences = new Collection<Snowflake, unknown>();
+    private presences = new Collection<Snowflake, Presence>();
 
     private maxPresences?: number | null;
 
