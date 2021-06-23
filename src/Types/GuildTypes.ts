@@ -1,6 +1,7 @@
 import type { Snowflake } from "./Snowflake.ts";
 import type { UserData } from "./UserTypes.ts";
 import type { BaseChannelData } from "./ChannelTypes.ts";
+import type { PresenceData } from "./PresenceTypes.ts";
 
 export type GuildFeatures =
     "ANIMATED_ICON" |
@@ -53,6 +54,7 @@ export interface GuildData {
     voice_states: GuildVoiceStateData[];
     members: GuildMemberData[];
     channels: GuildChannelData[];
+    presences: PresenceData[]
     max_presences?: number;
     max_members: number;
     vanity_url_code?: string;
