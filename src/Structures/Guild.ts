@@ -252,11 +252,9 @@ export class Guild extends Base<GuildData> {
         this.approximatePresenceCount = "approximate_presence_count" in data ? data.approximate_presence_count : null;
         this.nsfwLevel = "nsfw_level" in data ? data.nsfw_level : null;
         this.createdAt = new Date(Util.idToTimestamp(this.id));
-
-        if (this.name === "dinord") {
-            console.log(this.presences);
-        }
     }
+
+    public get getID() { return this.id; }
 
     public get getRoles() { return this.roles; }
 
