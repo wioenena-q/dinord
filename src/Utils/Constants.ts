@@ -17,3 +17,8 @@ export enum OPCodes {
     HELLO,
     HEARTBEAT_ACK
 }
+
+export enum ClientEvents {
+    READY = "ready",
+    GUILD_CREATE = "guildCreate"
+}
