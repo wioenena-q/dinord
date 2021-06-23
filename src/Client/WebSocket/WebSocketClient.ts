@@ -99,7 +99,7 @@ export class WebSocketClient extends EventEmitter {
                     const { default: action } = await import(`./Actions/${t}.ts`);
                     action(this.client, data);
                 } catch (e) {
-                    console.log(e);
+                    //  console.log(e);
                 }
                 break;
 
@@ -177,6 +177,8 @@ export class WebSocketClient extends EventEmitter {
     public destroy() {
         clearInterval(this.interval);
     }
+
+    public get getGuildSize() { return this.guildSize; }
 
     public set setGuildSize(size: number) {
         this.guildSize = size;
