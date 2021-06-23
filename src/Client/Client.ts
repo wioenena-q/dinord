@@ -4,6 +4,7 @@ import { WebSocketClient } from "./WebSocket/WebSocketClient.ts";
 import type { ClientUser } from "./ClientUser.ts";
 import type { User } from "../Structures/User.ts";
 import type { Snowflake } from "../Types/Snowflake.ts";
+import type { Guild } from "../Structures/Guild.ts";
 
 export class Client extends EventEmitter {
     /**
@@ -51,6 +52,14 @@ export class Client extends EventEmitter {
     private users = new Collection<Snowflake, User>();
 
     /**
+     *
+     * The guilds cache for client.
+     * @private
+     * @memberof Client
+     */
+    private guilds = new Collection<Snowflake, Guild>();
+
+    /**
      * Creates an instance of Client.
      * @param {ClientOptions} [options]
      * @memberof Client
@@ -95,6 +104,8 @@ export class Client extends EventEmitter {
     public get getOptions() { return this.options; }
 
     public get getUsers() { return this.users; }
+
+    public get getGuilds() { return this.guilds; }
 
     public set setUser(user: ClientUser) {
         this.user = user;
