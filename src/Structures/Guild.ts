@@ -22,6 +22,7 @@ import { GuildVoiceChannel } from "./GuildVoiceChannel.ts";
 import { GuildCategoryChannel } from "./GuildCategoryChannel.ts";
 import { GuildNewsChannel } from "./GuildNewsChannel.ts";
 import { GuildStoreChannel } from "./GuildStoreChannel.ts";
+import { Presence } from "./Presence.ts";
 
 /**
  *
@@ -91,7 +92,7 @@ export class Guild extends Base<GuildData> {
 
     private channels = new Collection<Snowflake, GuildChannel>();
 
-    private presences!: unknown;
+    private presences = new Collection<Snowflake, unknown>();
 
     private maxPresences?: number | null;
 
@@ -150,28 +151,6 @@ export class Guild extends Base<GuildData> {
         this.verificationLevel = data.verification_level;
         this.defaultMessageNotifications = data.default_message_notifications;
         this.explicitContentFilter = data.explicit_content_filter;
-        this.mfaLevel = data.mfa_level;
-        this.applicationID = data.application_id || null;
-        this.systemChannelID = data.system_channel_id || null;
-        this.systemChannelFlags = data.system_channel_flags;
-        this.rulesChannelID = data.rules_channel_id || null;
-        this.joinedAt = new Date(data.joined_at);
-        this.large = data.large;
-        this.memberCount = data.member_count;
-        this.maxPresences = data.max_presences || null;
-        this.maxMembers = data.max_members;
-        this.vanityURLCode = data.vanity_url_code || null;
-        this.description = data.description || null;
-        this.banner = data.banner || null;
-        this.premiumTier = data.premium_tier;
-        this.premiumSubscriptionCount = data.premium_subscription_count;
-        this.preferredLocale = data.preferred_locale;
-        this.maxVideoChannelUsers = data.max_video_channel_users;
-        this.approximateMemberCount = "approximate_member_count" in data ? data.approximate_member_count : null;
-        this.approximatePresenceCount = "approximate_presence_count" in data ? data.approximate_presence_count : null;
-        this.nsfwLevel = "nsfw_level" in data ? data.nsfw_level : null;
-        this.createdAt = new Date(Util.idToTimestamp(this.id));
-        this.features = data.features;
 
         if ("roles" in data) {
             // Delete this guild's 'roles' cache.
@@ -192,6 +171,18 @@ export class Guild extends Base<GuildData> {
                 this.emojis.set(emoji.getID, emoji);
             }
         }
+
+        this.features = data.features;
+
+        this.mfaLevel = data.mfa_level;
+        this.applicationID = data.application_id || null;
+        this.systemChannelID = data.system_channel_id || null;
+        this.systemChannelFlags = data.system_channel_flags;
+        this.rulesChannelID = data.rules_channel_id || null;
+        this.joinedAt = new Date(data.joined_at);
+        this.large = data.large;
+        this.available = !data.unavailable;
+        this.memberCount = data.member_count;
 
         if ("voice_states" in data) {
             // Delete this guild's 'voiceStates' cache.
@@ -241,6 +232,29 @@ export class Guild extends Base<GuildData> {
                 if (typeof channel !== "undefined")
                     this.channels.set(channel.getID, channel!);
             }
+        }
+
+        for (const presenceData of data.presences) {
+            const presence = new Presence(this.client, this, presenceData);
+            this.presences.set(presence.getUser.getID, presence);
+        }
+
+        this.maxPresences = data.max_presences || null;
+        this.maxMembers = data.max_members;
+        this.vanityURLCode = data.vanity_url_code || null;
+        this.description = data.description || null;
+        this.banner = data.banner || null;
+        this.premiumTier = data.premium_tier;
+        this.premiumSubscriptionCount = data.premium_subscription_count;
+        this.preferredLocale = data.preferred_locale;
+        this.maxVideoChannelUsers = data.max_video_channel_users;
+        this.approximateMemberCount = "approximate_member_count" in data ? data.approximate_member_count : null;
+        this.approximatePresenceCount = "approximate_presence_count" in data ? data.approximate_presence_count : null;
+        this.nsfwLevel = "nsfw_level" in data ? data.nsfw_level : null;
+        this.createdAt = new Date(Util.idToTimestamp(this.id));
+
+        if (this.name === "dinord") {
+            console.log(this.presences);
         }
     }
 
