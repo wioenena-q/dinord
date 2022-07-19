@@ -1,8 +1,0 @@
-{
-  "compilerOptions": {
-    "noUnusedParameters": true,
-    "importsNotUsedAsValues": "error",
-    "strict": true
-  },
-  "include": ["src/**/*", "tests/**/*"]
-}
