@@ -1,9 +1,12 @@
-import { GatewayCloseEventCodes, OPCodes, WSS } from "../Utils/Constants.ts";
-import { INullable, IPayloads } from "../Utils/Types.ts";
-import { Client } from "./Client.ts";
+import { GatewayCloseEventCodes, OPCodes, WSS } from '../Utils/Constants.ts';
+import { INullable, IPayloads } from '../Utils/Types.ts';
+import { Client } from './Client.ts';
+
 export class WebSocketClient {
   #socket?: INullable<WebSocket>;
+
   #client: Client;
+
   #interval?: number;
 
   public constructor(client: Client) {
@@ -92,8 +95,8 @@ export class WebSocketClient {
               intents: this.#client.config.intents,
               properties: {
                 os: Deno.build.os,
-                browser: "dinord",
-                device: "dinord"
+                browser: 'dinord',
+                device: 'dinord'
               }
             }
           })

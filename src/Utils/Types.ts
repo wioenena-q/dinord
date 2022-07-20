@@ -1,6 +1,7 @@
+import { IntentFlags } from './Constants.ts';
+
+// Types
 export type INullable<T> = T | null | undefined;
-export const isString = (val: unknown): val is string =>
-  typeof val === "string";
 
 export interface IPayloads {
   op: number;
@@ -8,6 +9,14 @@ export interface IPayloads {
   s?: number;
   t?: string;
 }
+export interface IClientConfig {
+  token?: INullable<string>;
+  intents: IntentFlags | IntentFlags[];
+}
 
+// Functions
 export const isArray = (val: unknown): val is unknown[] =>
   val instanceof Array && Array.isArray(val);
+
+export const isString = (val: unknown): val is string =>
+  typeof val === 'string';

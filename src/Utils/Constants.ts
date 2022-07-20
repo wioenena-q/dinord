@@ -1,4 +1,4 @@
-export const WSS = "wss://gateway.discord.gg/?v=10&encoding=json";
+export const WSS = 'wss://gateway.discord.gg/?v=10&encoding=json';
 
 // Discord Gateway Opcodes. Ref https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-opcodes
 export const enum OPCodes {
