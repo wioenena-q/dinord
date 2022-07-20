@@ -1,4 +1,4 @@
-import { IntentFlags } from './Constants.ts';
+import type { IntentFlags } from './Constants.ts';
 
 // Types
 export type INullable<T> = T | null | undefined;
@@ -20,3 +20,6 @@ export const isArray = (val: unknown): val is unknown[] =>
 
 export const isString = (val: unknown): val is string =>
   typeof val === 'string';
+
+export const isNumber = (val: unknown): val is number =>
+  typeof val === 'number';
