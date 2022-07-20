@@ -1,7 +1,7 @@
-import { IntentFlags } from '../Utils/Constants.ts';
+import type { IntentFlags } from '../Utils/Constants.ts';
 import {
   type IClientConfig,
-  INullable,
+  type INullable,
   isArray,
   isString
 } from '../Utils/Types.ts';
