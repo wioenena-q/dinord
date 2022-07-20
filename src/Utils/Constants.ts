@@ -1,4 +1,5 @@
 export const WSS = 'wss://gateway.discord.gg/?v=10&encoding=json';
+export const noop = () => {};
 
 // Discord Gateway Opcodes. Ref https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-opcodes
 export const enum OPCodes {
@@ -70,4 +71,10 @@ export const enum IntentFlags {
     GUILD_SCHEDULED_EVENTS |
     AUTO_MODERATION_CONFIGURATION |
     AUTO_MODERATION_EXECUTION
+}
+
+export const enum ClientEvents {
+  READY = 'ready',
+  GUILD_CREATE = 'guildCreate',
+  GUILD_DELETE = 'guildDelete'
 }
