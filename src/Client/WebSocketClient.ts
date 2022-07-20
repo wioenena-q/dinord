@@ -1,13 +1,20 @@
-import { GatewayCloseEventCodes, OPCodes, WSS } from '../Utils/Constants.ts';
-import { INullable, IPayloads } from '../Utils/Types.ts';
-import { Client } from './Client.ts';
+import {
+  GatewayCloseEventCodes,
+  noop,
+  OPCodes,
+  WSS
+} from '../Utils/Constants.ts';
+import { type INullable, type IPayloads, isNumber } from '../Utils/Types.ts';
+import type { Client } from './Client.ts';
 
 export class WebSocketClient {
   #socket?: INullable<WebSocket>;
 
   #client: Client;
 
-  #interval?: number;
+  #interval?: INullable<number>;
+  #guildSize: number = 0;
+  #lastSeq?: INullable<number> = null;
 
   public constructor(client: Client) {
     this.#client = client;
@@ -35,7 +42,6 @@ export class WebSocketClient {
       case GatewayCloseEventCodes.NOT_AUTHENTICATED:
         break;
       case GatewayCloseEventCodes.AUTHENTICATION_FAILED:
-        this.close();
         break;
       case GatewayCloseEventCodes.ALREADY_AUTHENTICATED:
         break;
@@ -66,7 +72,15 @@ export class WebSocketClient {
     const { op, d, s, t } = JSON.parse(ev.data as string) as IPayloads;
 
     switch (op) {
+      // Any event triggered.
       case OPCodes.DISPATCH:
+        this.#lastSeq = s;
+        import(`./Events/${t}.ts`)
+          .then(({ default: handler }) => {
+            handler(this.#client, d);
+          })
+          .catch(noop);
+
         break;
       case OPCodes.HEARTBEAT:
         break;
@@ -87,6 +101,7 @@ export class WebSocketClient {
 
       case OPCodes.HELLO: {
         const { heartbeat_interval } = d!;
+
         this.#socket!.send(
           JSON.stringify({
             op: OPCodes.IDENTIFY,
@@ -118,7 +133,8 @@ export class WebSocketClient {
       this.#interval = setInterval(() => {
         this.#socket!.send(
           JSON.stringify({
-            op: OPCodes.HEARTBEAT
+            op: OPCodes.HEARTBEAT,
+            d: this.#lastSeq
           })
         );
       }, ms);
@@ -126,18 +142,30 @@ export class WebSocketClient {
   }
 
   public close() {
-    if (this.#interval) clearInterval(this.#interval);
+    if (this.#interval) {
+      clearInterval(this.#interval);
+      this.#interval = null;
+    }
     if (this.#socket) {
       this.#socket.close();
       this.#socket = null;
     }
   }
 
-  public get client(): Client {
+  public get client() {
     return this.#client;
   }
 
-  public get socket(): INullable<WebSocket> {
+  public get socket() {
     return this.#socket;
+  }
+
+  public get guildSize() {
+    return this.#guildSize;
+  }
+
+  public set guildSize(size: number) {
+    if (isNumber(size)) this.#guildSize = size;
+    else throw new TypeError('Guild size must be a number.');
   }
 }
