@@ -49,7 +49,7 @@ export class WebSocketClient {
       case GatewayCloseEventCodes.INVALID_API_VERSION:
         break;
       case GatewayCloseEventCodes.INVALID_INTENTS:
-        break;
+        throw new Error(`${ev.reason} Intents: ${this.#client.config.intents}`);
       case GatewayCloseEventCodes.DISALLOWED_INTENTS:
         break;
       default:
@@ -61,6 +61,7 @@ export class WebSocketClient {
   #onMessage = (ev: MessageEvent<unknown>) => {
     // deno-lint-ignore no-unused-vars
     const { op, d, s, t } = JSON.parse(ev.data as string) as IPayloads;
+
     switch (op) {
       case OPCodes.DISPATCH:
         break;
@@ -88,9 +89,9 @@ export class WebSocketClient {
             op: OPCodes.IDENTIFY,
             d: {
               token: this.#client.config.token,
-              intents: 513,
+              intents: this.#client.config.intents,
               properties: {
-                os: "linux",
+                os: Deno.build.os,
                 browser: "dinord",
                 device: "dinord"
               }
