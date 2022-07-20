@@ -8,3 +8,6 @@ export interface IPayloads {
   s?: number;
   t?: string;
 }
+
+export const isArray = (val: unknown): val is unknown[] =>
+  val instanceof Array && Array.isArray(val);
