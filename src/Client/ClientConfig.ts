@@ -1,12 +1,19 @@
-import { INullable, isString } from "../Utils/Types.ts";
+import { IntentFlags } from "../Utils/Constants.ts";
+import { INullable, isArray, isString } from "../Utils/Types.ts";
 
 export class ClientConfig {
   #token?: INullable<string>;
 
-  public constructor();
-  public constructor(token: INullable<string>);
-  public constructor(token?: INullable<string>) {
+  #intents: IntentFlags;
+
+  public constructor({ token, intents }: IClientConfig) {
     this.token = token;
+
+    if (typeof intents === "number") this.#intents = intents;
+    else if (isArray(intents))
+      this.#intents = intents.reduce((acc, cur) => acc | cur, 0);
+    else
+      throw new TypeError("Intents must be a number or an array of numbers.");
   }
 
   /**
@@ -21,4 +28,13 @@ export class ClientConfig {
   public get token(): INullable<string> {
     return this.#token;
   }
+
+  public get intents(): IntentFlags {
+    return this.#intents;
+  }
+}
+
+export interface IClientConfig {
+  token?: INullable<string>;
+  intents: IntentFlags | IntentFlags[];
 }
