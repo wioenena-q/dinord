@@ -1,11 +1,18 @@
-import { EventEmitter } from '../deps.ts';
-import { ClientConfig } from './ClientConfig.ts';
+import { Collection, EventEmitter } from '../deps.ts';
 import { WebSocketClient } from './WebSocketClient.ts';
+import type { INullable } from '../Utils/Types.ts';
+import type { ClientConfig } from './ClientConfig.ts';
+import type { ClientUser } from './ClientUser.ts';
+import type { Guild } from '../Structures/Guild.ts';
 
 export class Client extends EventEmitter {
   #config: ClientConfig;
 
   #ws = new WebSocketClient(this);
+
+  #guilds = new Collection<string, Guild>();
+
+  #user?: INullable<ClientUser>;
 
   /**
    *
@@ -37,5 +44,17 @@ export class Client extends EventEmitter {
 
   public get ws(): WebSocketClient {
     return this.#ws;
+  }
+
+  public get user() {
+    return this.#user;
+  }
+
+  public set user(user: INullable<ClientUser>) {
+    this.#user = user;
+  }
+
+  public get guilds() {
+    return this.#guilds;
   }
 }
