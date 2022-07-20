@@ -6,16 +6,13 @@ export class Client extends EventEmitter {
   #config: ClientConfig;
   #ws = new WebSocketClient(this);
 
-  public constructor();
-  public constructor(config: ClientConfig);
-
   /**
    *
    * @param [config] Config to use for the client.
    */
-  public constructor(config?: ClientConfig) {
+  public constructor(config: ClientConfig) {
     super();
-    this.#config = config ?? new ClientConfig();
+    this.#config = config;
   }
 
   public login(token: string): Promise<void>;
