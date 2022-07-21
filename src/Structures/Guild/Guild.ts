@@ -1,13 +1,19 @@
-import type { Client } from '../Client/Client.ts';
+import type { Client } from '../../Client/Client.ts';
+import { Collection } from '../../deps.ts';
 import type {
   GuildFeatures,
   IGuildCreatePayloadData,
   Snowflake
-} from '../Utils/ApiTypes.ts';
-import type { INullable } from '../Utils/Types.ts';
-import { Base } from './Base.ts';
+} from '../../Utils/ApiTypes.ts';
+import { Debug } from '../../Utils/dev.ts';
+import type { INullable } from '../../Utils/Types.ts';
+import { Utils } from '../../Utils/Utils.ts';
+import { Base } from '../Base.ts';
+import { Role } from './Role.ts';
 
+@Debug
 export class Guild extends Base {
+  // #region Props and type definitions
   #id: Snowflake;
   #name: string;
   #icon?: INullable<string>;
@@ -21,9 +27,9 @@ export class Guild extends Base {
   #verificationLevel: number;
   #defaultMessageNotifications: number;
   #explicitContentFilter: number;
-  #roles: unknown[];
-  #emojis: unknown[];
-  #features: GuildFeatures[];
+  #roles = new Collection<Snowflake, Role>();
+  #emojis: unknown[] = [];
+  #features: GuildFeatures[] = [];
   #mfaLevel: number;
   #applicationId?: INullable<Snowflake>;
   #systemChannelId?: INullable<Snowflake>;
@@ -45,9 +51,11 @@ export class Guild extends Base {
   #nsfwLevel: number;
   #stickers: INullable<unknown[]>;
   #premiumProgressBarEnabled: boolean;
+  // #endregion
 
   public constructor(client: Client, data: IGuildCreatePayloadData) {
     super(client);
+    // #region Handle props
     this.#id = data.id;
     this.#name = data.name;
     this.#icon = data.icon ?? null;
@@ -60,9 +68,6 @@ export class Guild extends Base {
     this.#verificationLevel = data.verification_level;
     this.#defaultMessageNotifications = data.default_message_notifications;
     this.#explicitContentFilter = data.explicit_content_filter;
-    this.#roles = data.roles;
-    this.#emojis = data.emojis;
-    this.#features = data.features;
     this.#mfaLevel = data.mfa_level;
     this.#applicationId = data.application_id ?? null;
     this.#systemChannelId = data.system_channel_id ?? null;
@@ -85,8 +90,16 @@ export class Guild extends Base {
     this.#stickers = data.stickers ?? null;
     this.#premiumProgressBarEnabled =
       data.premium_progress_bar_enabled ?? false;
+    // #endregion
+
+    // #region Handle roles
+    for (const apiRoleData of data.roles) {
+      this.#roles.set(apiRoleData.id, new Role(this, apiRoleData));
+    }
+    // #endregion
   }
 
+  // #region Getters
   public get id() {
     return this.#id;
   }
@@ -234,4 +247,13 @@ export class Guild extends Base {
   public get premiumProgressBarEnabled() {
     return this.#premiumProgressBarEnabled;
   }
+
+  public get createdTimestamp() {
+    return Utils.getTimestampFromId(this.#id);
+  }
+
+  public get createdAt() {
+    return new Date(this.createdTimestamp);
+  }
+  // #endregion
 }
