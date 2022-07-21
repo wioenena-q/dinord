@@ -1,4 +1,4 @@
-import { Guild } from '../../Structures/Guild.ts';
+import { Guild } from '../../Structures/Guild/Guild.ts';
 import { ClientEvents } from '../../Utils/Constants.ts';
 import type { Client } from '../Client.ts';
 import type { IGuildCreatePayloadData } from '../../Utils/ApiTypes.ts';

@@ -1,8 +1,5 @@
 import type { Client } from '../Client.ts';
-import type {
-  IGuildCreatePayloadData,
-  IUnavailableGuild
-} from '../../Utils/ApiTypes.ts';
+import type { IUnavailableGuild } from '../../Utils/ApiTypes.ts';
 import { ClientEvents } from '../../Utils/Constants.ts';
 
 export default (client: Client, d: IUnavailableGuild) => {
