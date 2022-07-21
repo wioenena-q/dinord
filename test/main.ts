@@ -13,9 +13,16 @@ const client = new Client(
 );
 
 client.on(ClientEvents.READY, () => {
-  console.log('Ready!');
+  client.debug();
+
+  console.log('%s is ready!', client.user!.username);
   for (const [id, guild] of client.guilds) {
-    console.log('Guild (%s): %s', id, guild.name);
+    console.log(
+      'Guild (%s): %s, createdAt: %s',
+      id,
+      guild.name,
+      guild.createdAt.toLocaleString()
+    );
   }
 });
 
