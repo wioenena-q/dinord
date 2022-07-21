@@ -3,8 +3,10 @@ import { WebSocketClient } from './WebSocketClient.ts';
 import type { INullable } from '../Utils/Types.ts';
 import type { ClientConfig } from './ClientConfig.ts';
 import type { ClientUser } from './ClientUser.ts';
-import type { Guild } from '../Structures/Guild.ts';
+import type { Guild } from '../Structures/Guild/Guild.ts';
+import { Debug } from '../Utils/dev.ts';
 
+@Debug
 export class Client extends EventEmitter {
   #config: ClientConfig;
 
