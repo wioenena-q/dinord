@@ -9,7 +9,7 @@ import { Debug } from '../../Utils/dev.ts';
 import type { INullable } from '../../Utils/Types.ts';
 import { Utils } from '../../Utils/Utils.ts';
 import { Base } from '../Base.ts';
-import { Role } from './Role.ts';
+import { Role } from './Role/Role.ts';
 
 @Debug
 export class Guild extends Base {

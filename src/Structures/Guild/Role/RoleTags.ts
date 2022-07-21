@@ -1,6 +1,6 @@
-import { IRoleTags, Snowflake } from '../../Utils/ApiTypes.ts';
-import { Debug } from '../../Utils/dev.ts';
-import { INullable } from '../../Utils/Types.ts';
+import { IRoleTags, Snowflake } from '../../../Utils/ApiTypes.ts';
+import { Debug } from '../../../Utils/dev.ts';
+import { INullable } from '../../../Utils/Types.ts';
 import { Role } from './Role.ts';
 
 @Debug

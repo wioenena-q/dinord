@@ -1,10 +1,8 @@
-import { Base } from '../Base.ts';
-import type { Client } from '../../Client/Client.ts';
-import type { IRole, Snowflake } from '../../Utils/ApiTypes.ts';
-import { INullable } from '../../Utils/Types.ts';
-import { Guild } from './Guild.ts';
+import type { IRole, Snowflake } from '../../../Utils/ApiTypes.ts';
+import { INullable } from '../../../Utils/Types.ts';
+import { Guild } from '../Guild.ts';
 import { RoleTags } from './RoleTags.ts';
-import { Debug } from '../../Utils/dev.ts';
+import { Debug } from '../../../Utils/dev.ts';
 
 @Debug
 export class Role {
