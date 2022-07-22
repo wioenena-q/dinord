@@ -19,19 +19,19 @@ export const enum OPCodes {
 // Discord Gateway Close Event Codes. Ref https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes
 export const enum GatewayCloseEventCodes {
   UNKNOWN_ERROR = 4000,
-  UNKNOWN_OPCODE = 4001,
-  DECODE_ERROR = 4002,
-  NOT_AUTHENTICATED = 4003,
-  AUTHENTICATION_FAILED = 4004,
-  ALREADY_AUTHENTICATED = 4005,
+  UNKNOWN_OPCODE,
+  DECODE_ERROR,
+  NOT_AUTHENTICATED,
+  AUTHENTICATION_FAILED,
+  ALREADY_AUTHENTICATED,
   INVALID_SEQ = 4007,
-  RATE_LIMITED = 4008,
-  SESSION_TIMED_OUT = 4009,
-  INVALID_SHARD = 4010,
-  SHARDING_REQUIRED = 4011,
-  INVALID_API_VERSION = 4012,
-  INVALID_INTENTS = 4013,
-  DISALLOWED_INTENTS = 4014
+  RATE_LIMITED,
+  SESSION_TIMED_OUT,
+  INVALID_SHARD,
+  SHARDING_REQUIRED,
+  INVALID_API_VERSION,
+  INVALID_INTENTS,
+  DISALLOWED_INTENTS
 }
 
 // Discord Gateway Intents. Ref https://discord.com/developers/docs/topics/gateway#gateway-intents
@@ -77,4 +77,24 @@ export const enum ClientEvents {
   READY = 'ready',
   GUILD_CREATE = 'guildCreate',
   GUILD_DELETE = 'guildDelete'
+}
+
+export const enum ChannelTypes {
+  GUILD_TEXT = 0,
+  DM,
+  GUILD_VOICE,
+  GROUP_DM,
+  GUILD_CATEGORY,
+  GUILD_NEWS,
+  GUILD_NEWS_THREAD = 10,
+  GUILD_PUBLIC_THREAD,
+  GUILD_PRIVATE_THREAD,
+  GUILD_STAGE_VOICE,
+  GUILD_DIRECTORY,
+  GUILD_FORUM
+}
+
+export const enum PermissionOverwriteType {
+  ROLE,
+  MEMBER
 }
