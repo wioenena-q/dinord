@@ -5,17 +5,20 @@ import type { ClientConfig } from './ClientConfig.ts';
 import type { ClientUser } from './ClientUser.ts';
 import type { Guild } from '../Structures/Guild/Guild.ts';
 import { Debug } from '../Utils/dev.ts';
+import { Snowflake } from '../Utils/ApiTypes.ts';
+import { User } from '../Structures/User.ts';
 
 @Debug
 export class Client extends EventEmitter {
+  // #region Fields
   #config: ClientConfig;
-
   #ws = new WebSocketClient(this);
-
-  #guilds = new Collection<string, Guild>();
-
+  #guilds = new Collection<Snowflake, Guild>();
+  #users = new Collection<Snowflake, User>();
   #user?: INullable<ClientUser>;
+  // #endregion
 
+  // #region Constructor
   /**
    *
    * @param [config] Config to use for the client.
@@ -24,7 +27,9 @@ export class Client extends EventEmitter {
     super();
     this.#config = config;
   }
+  // #endregion
 
+  // #region Methods
   public login(token: string): Promise<void>;
   public login(): Promise<void>;
   /**
@@ -40,6 +45,12 @@ export class Client extends EventEmitter {
     return Promise.resolve(void 0);
   }
 
+  public destroy() {
+    this.#ws.close();
+  }
+  // #endregion
+
+  // #region Getter & Setter
   public get config(): ClientConfig {
     return this.#config;
   }
@@ -59,4 +70,9 @@ export class Client extends EventEmitter {
   public get guilds() {
     return this.#guilds;
   }
+
+  public get users() {
+    return this.#users;
+  }
+  // #endregion
 }
