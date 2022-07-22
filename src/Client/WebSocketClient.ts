@@ -1,25 +1,23 @@
-import {
-  GatewayCloseEventCodes,
-  noop,
-  OPCodes,
-  WSS
-} from '../Utils/Constants.ts';
+import { GatewayCloseEventCodes, OPCodes, WSS } from '../Utils/Constants.ts';
 import { type INullable, type IPayloads, isNumber } from '../Utils/Types.ts';
 import type { Client } from './Client.ts';
 
 export class WebSocketClient {
+  // #region Fields
   #socket?: INullable<WebSocket>;
-
   #client: Client;
-
   #interval?: INullable<number>;
   #guildSize: number = 0;
   #lastSeq?: INullable<number> = null;
+  // #endregion
 
+  // #region Constructor
   public constructor(client: Client) {
     this.#client = client;
   }
+  // #endregion
 
+  // #region Methods
   public connect() {
     if (!this.#socket) {
       this.#socket = new WebSocket(WSS);
@@ -61,8 +59,10 @@ export class WebSocketClient {
         throw new Error(`${ev.reason} Intents: ${this.#client.config.intents}`);
       case GatewayCloseEventCodes.DISALLOWED_INTENTS:
         break;
+      case 1000: // self destruct
+        break;
       default:
-        throw new Error(`Unknown close event code: ${ev.code}`);
+        console.log(`Unknown close event code: ${ev.code} - ${ev.reason}`);
     }
     this.close();
   };
@@ -79,7 +79,13 @@ export class WebSocketClient {
           .then(({ default: handler }) => {
             handler(this.#client, d);
           })
-          .catch(noop);
+          .catch((err) => {
+            if (err.code == 'ERR_MODULE_NOT_FOUND') {
+              console.log(`Event ${t} not found.`);
+              return;
+            }
+            throw err;
+          });
 
         break;
       case OPCodes.HEARTBEAT:
@@ -147,11 +153,13 @@ export class WebSocketClient {
       this.#interval = null;
     }
     if (this.#socket) {
-      this.#socket.close();
+      this.#socket.close(1000);
       this.#socket = null;
     }
   }
+  // #endregion
 
+  // #region Getter & Setter
   public get client() {
     return this.#client;
   }
@@ -168,4 +176,5 @@ export class WebSocketClient {
     if (isNumber(size)) this.#guildSize = size;
     else throw new TypeError('Guild size must be a number.');
   }
+  // #endregion
 }
