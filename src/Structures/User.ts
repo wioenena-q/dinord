@@ -1,11 +1,13 @@
 import type { Client } from '../Client/Client.ts';
 import { IUser, Snowflake } from '../Utils/ApiTypes.ts';
-import { INullable } from '../Utils/Types.ts';
+import { Debug, Todo } from '../Utils/dev.ts';
+import { Eq, INullable } from '../Utils/Types.ts';
 import { Utils } from '../Utils/Utils.ts';
 import { Base } from './Base.ts';
 
-export class User extends Base {
-  // #region Props and type definitions
+@Debug
+export class User extends Base implements Eq<User> {
+  // #region Fields
   #id: Snowflake;
   #username: string;
   #discriminator: string;
@@ -17,14 +19,14 @@ export class User extends Base {
   #accentColor?: INullable<number>;
   #locale?: INullable<string>;
   #verified: boolean;
-  #email?: string;
-  #flags?: number;
+  #email?: INullable<string>;
+  #flags?: INullable<number>;
   #premiumType?: INullable<number>;
   #publicFlags?: INullable<number>;
   // #endregion
 
+  // #region Constructor
   public constructor(client: Client, data: IUser) {
-    // #region Handle props
     super(client);
     this.#id = data.id;
     this.#username = data.username;
@@ -37,14 +39,32 @@ export class User extends Base {
     this.#accentColor = data.accent_color ?? null;
     this.#locale = data.locale ?? null;
     this.#verified = data.verified ?? false;
-    this.#email = data.email;
-    this.#flags = data.flags;
+    this.#email = data.email ?? null;
+    this.#flags = data.flags ?? null;
     this.#premiumType = data.premium_type ?? null;
     this.#publicFlags = data.public_flags ?? null;
-    // #endregion
+  }
+  // #endregion
+
+  // #region Methods
+  @Todo
+  public override toJSON() {
+    return {};
   }
 
-  // #region Getters
+  @Todo
+  public override toString() {
+    return '';
+  }
+
+  @Todo
+  public eq(other: User) {
+    return false;
+  }
+
+  // #endregion
+
+  // #region Getter & Setter
   public get id() {
     return this.#id;
   }
