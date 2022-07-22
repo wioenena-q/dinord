@@ -69,6 +69,13 @@ export interface IInstallParams {
   permissions: string;
 }
 
+export interface IPermissionOverwrite {
+  id: Snowflake;
+  type: number;
+  allow: string;
+  deny: string;
+}
+
 export interface IUser {
   id: Snowflake;
   username: string;
@@ -267,6 +274,7 @@ export interface IChannel {
   default_auto_archive_duration?: number;
   permissions?: string;
   flags?: number;
+  total_message_sent?: number;
 }
 
 export interface IPresenceUpdateObject {
