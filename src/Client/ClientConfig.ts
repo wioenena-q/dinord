@@ -1,26 +1,26 @@
 import type { IntentFlags } from '../Utils/Constants.ts';
-import {
-  type IClientConfig,
-  type INullable,
-  isArray,
-  isString
-} from '../Utils/Types.ts';
+import { type IClientConfig, type INullable, isArray, isString } from '../Utils/Types.ts';
 
 export class ClientConfig {
+  // #region Fields
   #token?: INullable<string>;
-
   #intents: IntentFlags;
+  // #endregion
 
+  // #region Constructor
   public constructor({ token, intents }: IClientConfig) {
     this.token = token;
 
     if (typeof intents === 'number') this.#intents = intents;
-    else if (isArray(intents))
-      this.#intents = intents.reduce((acc, cur) => acc | cur, 0);
-    else
-      throw new TypeError('Intents must be a number or an array of numbers.');
+    else if (isArray(intents)) this.#intents = intents.reduce((acc, cur) => acc | cur, 0);
+    else throw new TypeError('Intents must be a number or an array of numbers.');
   }
+  // #endregion
 
+  // #region Methods
+  // #endregion
+
+  // #region Getter & Setter
   /**
    *
    * @param value The token to use for the client.
@@ -37,4 +37,5 @@ export class ClientConfig {
   public get intents(): IntentFlags {
     return this.#intents;
   }
+  // #endregion
 }
