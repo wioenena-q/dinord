@@ -1,31 +1,27 @@
 import { IRoleTags, Snowflake } from '../../../Utils/ApiTypes.ts';
 import { Debug } from '../../../Utils/dev.ts';
 import { INullable } from '../../../Utils/Types.ts';
-import { Role } from './Role.ts';
 
 @Debug
-export class RoleTags {
-  // #region Props and type definitions
-  #role: Role;
+export class GuildRoleTags {
+  // #region Fields
   #botId?: INullable<Snowflake>;
   #integrationId?: INullable<Snowflake>;
   #premiumSubscriber?: null;
   // #endregion
 
-  public constructor(role: Role, data: IRoleTags) {
-    // #region Handle props
-    this.#role = role;
+  // #region Constructor
+  public constructor(data: IRoleTags) {
     this.#botId = data.bot_id ?? null;
     this.#integrationId = data.integration_id ?? null;
     this.#premiumSubscriber = data.premium_subscriber ?? null;
-    // #endregion
   }
+  // #endregion
 
-  // #region Getters
-  public get role() {
-    return this.#role;
-  }
+  // #region Methods
+  // #endregion
 
+  // #region Getter & Setter
   public get botId() {
     return this.#botId;
   }

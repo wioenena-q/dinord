@@ -1,12 +1,12 @@
 import type { IRole, Snowflake } from '../../../Utils/ApiTypes.ts';
 import { INullable } from '../../../Utils/Types.ts';
 import { Guild } from '../Guild.ts';
-import { RoleTags } from './RoleTags.ts';
+import { GuildRoleTags } from './GuildRoleTags.ts';
 import { Debug } from '../../../Utils/dev.ts';
 
 @Debug
-export class Role {
-  // #region Props and type definitions
+export class GuildRole {
+  // #region Fields
   #guild: Guild;
   #id: Snowflake;
   #name: string;
@@ -18,11 +18,11 @@ export class Role {
   #permissions: string;
   #managed: boolean;
   #mentionable: boolean;
-  #tags?: INullable<RoleTags>;
+  #tags?: INullable<GuildRoleTags>;
   // #endregion
 
+  // #region Constructor
   public constructor(guild: Guild, data: IRole) {
-    // #region Handle props
     this.#guild = guild;
     this.#id = data.id;
     this.#name = data.name;
@@ -34,11 +34,14 @@ export class Role {
     this.#permissions = data.permissions;
     this.#managed = data.managed;
     this.#mentionable = data.mentionable;
-    this.#tags = data.tags ? new RoleTags(this, data.tags) : null;
-    // #endregion
+    this.#tags = data.tags ? new GuildRoleTags(data.tags) : null;
   }
+  // #endregion
 
-  // #region Getters
+  // #region Methods
+  // #endregion
+
+  // #region Getter & Setter
   public get guild() {
     return this.#guild;
   }
