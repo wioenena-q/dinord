@@ -2,18 +2,29 @@ import type { Client } from '../../Client/Client.ts';
 import { Collection } from '../../deps.ts';
 import type {
   GuildFeatures,
+  IGuild,
   IGuildCreatePayloadData,
   Snowflake
 } from '../../Utils/ApiTypes.ts';
-import { Debug } from '../../Utils/dev.ts';
-import type { INullable } from '../../Utils/Types.ts';
+import { ChannelTypes } from '../../Utils/Constants.ts';
+import { Debug, Todo } from '../../Utils/dev.ts';
+import { Eq, INullable, isGuildHasExtraFields } from '../../Utils/Types.ts';
 import { Utils } from '../../Utils/Utils.ts';
 import { Base } from '../Base.ts';
-import { Role } from './Role/Role.ts';
+import { BaseChannel } from '../Channel/BaseChannel.ts';
+import { BaseGuildChannel } from './Channel/BaseGuildChannel.ts';
+import { GuildCategoryChannel } from './Channel/GuildCategoryChannel.ts';
+import { GuildTextChannel } from './Channel/GuildTextChannel.ts';
+import { GuildThreadChannel } from './Channel/GuildThreadChannel.ts';
+import { GuildVoiceChannel } from './Channel/GuildVoiceChannel.ts';
+import { GuildEmoji } from './GuildEmoji.ts';
+import { GuildMember } from './GuildMember.ts';
+import { GuildRole } from './Role/GuildRole.ts';
+import { VoiceState } from './VoiceState.ts';
 
 @Debug
-export class Guild extends Base {
-  // #region Props and type definitions
+export class Guild extends Base implements Eq<Guild> {
+  // #region Fields
   #id: Snowflake;
   #name: string;
   #icon?: INullable<string>;
@@ -27,8 +38,6 @@ export class Guild extends Base {
   #verificationLevel: number;
   #defaultMessageNotifications: number;
   #explicitContentFilter: number;
-  #roles = new Collection<Snowflake, Role>();
-  #emojis: unknown[] = [];
   #features: GuildFeatures[] = [];
   #mfaLevel: number;
   #applicationId?: INullable<Snowflake>;
@@ -51,15 +60,21 @@ export class Guild extends Base {
   #nsfwLevel: number;
   #stickers: INullable<unknown[]>;
   #premiumProgressBarEnabled: boolean;
+  #roles = new Collection<Snowflake, GuildRole>();
+  #emojis = new Collection<Snowflake, GuildEmoji>();
+  #voiceStates = new Collection<Snowflake, VoiceState>();
+  #members = new Collection<Snowflake, GuildMember>();
+  #channels = new Collection<Snowflake, GuildChannels>();
   // #endregion
 
-  public constructor(client: Client, data: IGuildCreatePayloadData) {
+  // #region Constructor
+  public constructor(client: Client, data: IGuildCreatePayloadData | IGuild) {
     super(client);
-    // #region Handle props
     this.#id = data.id;
     this.#name = data.name;
     this.#icon = data.icon ?? null;
     this.#splash = data.splash ?? null;
+    this.#discoverySplash = data.discovery_splash ?? null;
     this.#ownerId = data.owner_id;
     this.#afkChannelId = data.afk_channel_id ?? null;
     this.#afkTimeout = data.afk_timeout;
@@ -88,18 +103,82 @@ export class Guild extends Base {
     this.#welcomeScreen = data.welcome_screen ?? null;
     this.#nsfwLevel = data.nsfw_level;
     this.#stickers = data.stickers ?? null;
-    this.#premiumProgressBarEnabled =
-      data.premium_progress_bar_enabled ?? false;
-    // #endregion
+    this.#premiumProgressBarEnabled = data.premium_progress_bar_enabled ?? false;
 
-    // #region Handle roles
     for (const apiRoleData of data.roles) {
-      this.#roles.set(apiRoleData.id, new Role(this, apiRoleData));
+      this.#roles.set(apiRoleData.id, new GuildRole(this, apiRoleData));
     }
-    // #endregion
+
+    for (const apiEmojiData of data.emojis) {
+      this.#emojis.set(apiEmojiData.id!, new GuildEmoji(this, apiEmojiData));
+    }
+
+    if (isGuildHasExtraFields(data)) {
+      for (const apiVoiceStateData of data.voice_states) {
+        if (!this.#voiceStates.has(apiVoiceStateData.user_id!))
+          this.#voiceStates.set(
+            apiVoiceStateData.user_id!,
+            new VoiceState(this, apiVoiceStateData)
+          );
+      }
+
+      for (const apiGuildMemberData of data.members) {
+        const member = new GuildMember(this, apiGuildMemberData);
+        if (member.user) {
+          if (!this.client.users.has(member.user.id)) {
+            this.client.users.set(member.user.id, member.user);
+          }
+
+          this.#members.set(member.user.id, member);
+        }
+      }
+
+      for (const channelData of data.channels) {
+        let channel: GuildChannels | undefined;
+        switch (channelData.type) {
+          case ChannelTypes.GUILD_TEXT:
+            channel = new GuildTextChannel(this, channelData);
+            break;
+          case ChannelTypes.GUILD_VOICE:
+            channel = new GuildVoiceChannel(this, channelData);
+            break;
+          case ChannelTypes.GUILD_CATEGORY:
+            channel = new GuildCategoryChannel(this, channelData);
+            break;
+          default:
+            console.log('Unknown channel type: %d', channelData.type);
+            break;
+        }
+        if (channel) this.#channels.set(channel.id, channel);
+      }
+
+      for (const threadData of data.threads) {
+        this.#channels.set(threadData.id, new GuildThreadChannel(this, threadData));
+      }
+
+      console.log(this.#channels.size);
+    }
+  }
+  // #endregion
+
+  // #region Methods
+  @Todo
+  public override toJSON() {
+    return {};
   }
 
-  // #region Getters
+  @Todo
+  public override toString() {
+    return '';
+  }
+
+  @Todo
+  public eq(other: Guild) {
+    return false;
+  }
+  // #endregion
+
+  // #region Getter & Setter
   public get id() {
     return this.#id;
   }
@@ -150,14 +229,6 @@ export class Guild extends Base {
 
   public get explicitContentFilter() {
     return this.#explicitContentFilter;
-  }
-
-  public get roles() {
-    return this.#roles;
-  }
-
-  public get emojis() {
-    return this.#emojis;
   }
 
   public get features() {
@@ -248,6 +319,18 @@ export class Guild extends Base {
     return this.#premiumProgressBarEnabled;
   }
 
+  public get roles() {
+    return this.#roles;
+  }
+
+  public get emojis() {
+    return this.#emojis;
+  }
+
+  public get members() {
+    return this.#members;
+  }
+
   public get createdTimestamp() {
     return Utils.getTimestampFromId(this.#id);
   }
@@ -257,3 +340,7 @@ export class Guild extends Base {
   }
   // #endregion
 }
+
+export type GuildChannels =
+  | (GuildCategoryChannel | GuildTextChannel | GuildVoiceChannel)
+  | any;
