@@ -10,30 +10,32 @@ export const isString = (val: unknown): val is string => typeof val === 'string'
 
 export const isNumber = (val: unknown): val is number => typeof val === 'number';
 
-export const isObject = <O = Record<string | number | symbol, unknown>>(
-  val: unknown
-): val is O => val !== null && typeof val === 'object';
+export const isObject = <O = Record<PropertyKey, unknown>>(val: unknown): val is O =>
+  val !== null && typeof val === 'object';
 
-export const isFunction = (val: unknown): val is (...args: never[]) => unknown =>
-  typeof val === 'function';
+export const isFunction = (val: unknown): val is (...args: never[]) => unknown => typeof val === 'function';
 
 export const isBoolean = (val: unknown): val is boolean => typeof val === 'boolean';
 
-export const isInstanceOf = <T>(
-  val: unknown,
-  cls: { new (...args: never[]): unknown }
-): val is T => val instanceof cls;
+export const isInstanceOf = <T>(val: unknown, cls: { new (...args: never[]): unknown }): val is T =>
+  val instanceof cls;
 
-export const toObject = (target: any, keys: string[]) => {
-  return keys.reduce((acc, key) => {
+export const toObject = (target: any, keys: string[]): Record<PropertyKey, unknown> => {
+  // https://stackoverflow.com/questions/33605775/es6-dynamic-class-names
+  const o = new { [target.constructor.name]: class {} }[target.constructor.name]();
+
+  for (const key of keys) {
     const value = Reflect.get(target, key);
-    if (value !== undefined) {
-      if (isObject(value)) {
-        if (isFunction(value.toObject)) {
-          acc[key] = value.toObject();
-        } else acc[key] = value;
-      } else acc[key] = value;
-    }
-    return acc;
-  }, {} as Record<string | number | symbol, unknown>);
+    Object.defineProperty(o, key, {
+      value: isFunction(value?.toObject) ? value.toObject() : value,
+      enumerable: true
+    });
+  }
+
+  return o as Record<PropertyKey, unknown>;
 };
+
+export const wait = (ms: number) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
