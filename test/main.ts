@@ -1,32 +1,20 @@
-import { Client } from '../src/Client/Client.ts';
-import { ClientConfig } from '../src/Client/ClientConfig.ts';
 import { config } from 'https://deno.land/x/dotenv@v3.2.0/mod.ts?code';
-import { ChannelTypes, ClientEvents, IntentFlags } from '../src/Utils/Constants.ts';
+import { IntentFlags } from 'https://raw.githubusercontent.com/wioenena-q/dinord-api-types/master/src/api/v10/Intents.ts';
+import { Client } from '../src/Client/Client.ts';
 
 config({ export: true });
 
-const client = new Client(
-  new ClientConfig({
-    token: Deno.env.get('TOKEN'),
-    intents: IntentFlags.ALL
-  })
-);
-
-client.on(ClientEvents.READY, () => {
-  console.log('%s is ready!', client.user!.username);
-
-  for (const [id, guild] of client.guilds) {
-    console.log(
-      'Guild (%s): %s, createdAt: %s',
-      id,
-      guild.name,
-      guild.createdAt.toLocaleString()
-    );
+const client = new Client({
+  ws: {
+    intents: IntentFlags.Guilds,
+    shardCount: 1
   }
 });
 
-client.on(ClientEvents.GUILD_CREATE, (guild: any) => {
-  console.log('Guild created(%s): %s', guild.id, guild.name);
+client.on('shardReady', (shard) => {
+  console.log(shard.toString());
 });
 
-client.login();
+client.login(Deno.env.get('TOKEN')).then(() => {
+  console.log(client.ws.toString());
+});
