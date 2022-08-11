@@ -1,28 +1,29 @@
 import { IntentFlags } from 'https://raw.githubusercontent.com/wioenena-q/dinord-api-types/master/src/api/v10/mod.ts';
-import { Collection, EventEmitter } from '../../deps.ts';
+import { Collection } from '../../deps.ts';
 import { URLManager } from '../../Managers/URLManager.ts';
-import { isNumber, isObject, isString, toObject, wait } from '../../Utils/Utils.ts';
-import { Shard } from './Shard.ts';
+import { isInstanceOf, isNumber, isObject, isString, toObject, wait } from '../../Utils/Utils.ts';
+// Etf unpacking and packing library
+import { pack as ETFPack, unpack as ETFUnpack } from 'https://deno.land/x/void@1.0.4/mod.ts';
 
-import type { ToObject } from '../../Utils/Types.ts';
-import type { Client } from '../Client.ts';
+import type { ToObject, ToString } from '../../Utils/Types.ts';
+import { ClientEvents, type Client } from '../Client.ts';
+import { Shard, ShardState } from './Shard.ts';
 
 /**
  * @class
  * @extends {EventEmitter}
- * @implements {ToObject}
+ * @implements {ToObject, ToString}
  */
-export class WebSocketManager extends EventEmitter<WebSocketManagerEvents> implements ToObject {
+export class WebSocketManager implements ToObject, ToString {
   #client: Client;
-  // Connection queue for shard(s)
-  #connectQueue: number[] = [];
   // Maximum concurrency. null if new instance created
   #maxConcurrency: number | null = null;
+  #shards = new Collection<number, Shard>();
   #state: WebSocketManagerState;
   #options: Required<WebSocketManagerOptions>;
-  #shards = new Collection<number, Shard>();
   // Increased concurrency count on each shard connection
   #concurrencyCount = 0;
+  #decoder = new TextDecoder();
 
   /**
    *
@@ -36,8 +37,8 @@ export class WebSocketManager extends EventEmitter<WebSocketManagerEvents> imple
       throw new RangeError('WebSocketManager largeThreshold must be between 49 and 251');
 
     // If the options.shards is not a number or 'auto', it will throw an error.
-    if (options.shards !== undefined) {
-      if (!((isString(options.shards) && options.shards === 'auto') || isNumber(options.shards)))
+    if (options.shardCount !== undefined) {
+      if (!((isString(options.shardCount) && options.shardCount === 'auto') || isNumber(options.shardCount)))
         throw new TypeError('WebSocketManager shards must be a number or "auto"');
     }
 
@@ -46,11 +47,10 @@ export class WebSocketManager extends EventEmitter<WebSocketManagerEvents> imple
 
     if (!isNumber(options.intents)) throw new TypeError('WebSocketManager intents must be a number');
 
-    super();
     this.#client = client;
     this.#state = WebSocketManagerState.Disconnected;
     this.#options = Object.assign(
-      { largeThreshold: 50, compress: false, encoding: 'json', shards: 'auto' },
+      { largeThreshold: 50, compress: false, encoding: 'json', shardCount: 'auto' },
       options
     ) as Required<WebSocketManagerOptions>;
   }
@@ -61,50 +61,76 @@ export class WebSocketManager extends EventEmitter<WebSocketManagerEvents> imple
    */
   public async connect() {
     // If the state is already connected, return
-    if (this.#state === WebSocketManagerState.Connected) return;
+    if (this.#state === WebSocketManagerState.Connected) return Promise.resolve();
     // Set state to connecting
     this.#state = WebSocketManagerState.Connecting;
+    // Get concurrency limit and recommended shard amount
     const { shards, session_start_limit } = (await this.#client.rest.get(URLManager.gatewayBot())) as any; // TODO: remove any
     this.#maxConcurrency = session_start_limit.max_concurrency;
-    if (this.#options.shards === 'auto') this.#options.shards = shards;
-    // Create shards
+    if (this.#options.shardCount === 'auto') this.#options.shardCount = shards;
+
+    // Shards
     this.#createShards();
+    await this.#tryConnectShards();
+
     // Set state to connected
     this.#state = WebSocketManagerState.Connected;
   }
 
   /**
-   * Create shards by number of shards
-   * @returns {void}
+   * Create shards
    */
   #createShards() {
-    for (let i = 0; i < this.#options.shards; i++) {
+    for (let i = 0; i < this.#options.shardCount; i++) {
+      // Create a new shard
       const shard = new Shard(this, i);
-      this.#shards.set(i, shard);
-      this.#connectQueue.push(shard.id);
+      // Add the shard to the collection
+      this.#shards.set(shard.id, shard);
     }
-
-    this.#connectShards();
   }
 
   /**
-   * performs the gateway connection of shards and makes it conform to the concurrency limit
-   * @returns {void}
+   * Try to connect the shards
    */
-  async #connectShards() {
-    // Return if maxConcurrency is null or state is not connecting
-    if (this.#maxConcurrency === null || this.#state !== WebSocketManagerState.Connecting) return;
-    for await (const [, shard] of this.#shards) {
-      // if it exceeds the concurrency limit it should wait 5 seconds.
-      if (this.#concurrencyCount > this.#maxConcurrency) {
+  async #tryConnectShards() {
+    for await (const [_, shard] of this.#shards) {
+      if (this.#concurrencyCount >= this.#maxConcurrency!) {
+        // Wait for 5 seconds
         await wait(5000);
+        // Reset the concurrency count
         this.#concurrencyCount = 0;
       }
 
-      await shard.connect();
-      this.#concurrencyCount++;
-      this.#connectQueue.splice(this.#connectQueue.indexOf(shard.id), 1);
+      // If the shard is not connected, connect it
+      if (shard.state === ShardState.Disconnected) {
+        // It waits until the READY event is triggered on the shard.
+        await shard.connect();
+        // Trigger client event.
+        this.#client.emit(ClientEvents.ShardReady, shard);
+        // Increase the concurrency count
+        this.#concurrencyCount++;
+      }
     }
+  }
+
+  /**
+   * Packs data
+   * @param data - Data to be packed
+   * @returns
+   */
+  public pack(data: unknown): string | Uint8Array {
+    return this.#options.encoding === 'etf' ? ETFPack(data) : JSON.stringify(data);
+  }
+
+  /**
+   * Unpacks data
+   * @param data - Data to be unpacked
+   * @returns
+   */
+  public unpack(data: string | Uint8Array) {
+    return this.#options.encoding === 'etf' && isInstanceOf<Uint8Array>(data, Uint8Array)
+      ? ETFUnpack(data)
+      : JSON.parse(data as string);
   }
 
   /**
@@ -115,12 +141,23 @@ export class WebSocketManager extends EventEmitter<WebSocketManagerEvents> imple
     throw new Error('Not implemented');
   }
 
-  toObject(): Record<string, unknown> {
-    return toObject(this, ['state', 'options']);
+  toObject() {
+    return toObject(this, ['shards', 'state', 'options']);
+  }
+
+  public toString() {
+    return `${this.constructor.name} (state ${this.#state}, shards: ${this.#shards.size})`;
   }
 
   public get client() {
     return this.#client;
+  }
+
+  /**
+   * Shard collection
+   */
+  public get shards() {
+    return this.#shards;
   }
 
   /**
@@ -133,16 +170,20 @@ export class WebSocketManager extends EventEmitter<WebSocketManagerEvents> imple
   public get options() {
     return this.#options;
   }
+
+  /**
+   * For compressed JSON encoding
+   */
+  public get decoder() {
+    return this.#decoder;
+  }
 }
 
-export type WebSocketManagerEvents = {};
-
 export const enum WebSocketManagerState {
-  Disconnecting,
-  Disconnected,
   Connecting,
   Connected,
-  Reconnecting
+  Reconnecting,
+  Disconnected
 }
 
 /**
@@ -154,7 +195,7 @@ export const enum WebSocketManagerState {
  * @property {IntentFlags} intents Intent flags to use.
  */
 export interface WebSocketManagerOptions {
-  shards?: number | 'auto';
+  shardCount?: number | 'auto';
   largeThreshold?: number;
   compress?: boolean;
   encoding?: WSEncoding;
