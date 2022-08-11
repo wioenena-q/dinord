@@ -3,13 +3,25 @@ export interface ToJSON {
 }
 
 export interface ToObject {
-  toObject(): Record<string, unknown>;
+  toObject(): Record<PropertyKey, unknown>;
 }
 
 export interface ToString {
   toString(): string;
 }
 
-export interface Eq<T> {
+export interface Equal<T> {
   eq(other: T): boolean;
+}
+
+export interface Patchable {
+  patch(data: unknown): void;
+}
+
+export interface Clonable {
+  clone(): this;
+}
+
+export interface Updatable {
+  update(data: unknown): this;
 }
