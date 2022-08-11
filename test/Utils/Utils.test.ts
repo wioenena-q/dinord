@@ -1,3 +1,4 @@
+import { assertEquals, assertObjectMatch } from 'https://deno.land/std/testing/asserts.ts';
 import {
   isArray,
   isBoolean,
@@ -8,7 +9,6 @@ import {
   isString,
   toObject
 } from '../../src/Utils/Utils.ts';
-import { assertEquals, assertObjectMatch } from 'https://deno.land/std/testing/asserts.ts';
 
 Deno.test('isArray', () => {
   assertEquals(isArray([1, 2, 3]), true);
@@ -135,7 +135,7 @@ Deno.test('toObject', () => {
     f = new Second();
 
     toObject() {
-      return toObject(this, ['a', 'b', 'c', 'd', 'e', 'f']);
+      return toObject(this, Object.keys(this));
     }
   }
 
