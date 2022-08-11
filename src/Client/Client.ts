@@ -1,24 +1,24 @@
 import { Collection, EventEmitter } from '../deps.ts';
 import { URLManager } from '../Managers/URLManager.ts';
-import { isInstanceOf, isObject, isString, toObject } from '../Utils/Utils.ts';
-import { ClientUser } from './ClientUser.ts';
+import { isObject, isString, toObject } from '../Utils/Utils.ts';
+import { RESTClient } from './RESTClient.ts';
 import { WebSocketManager, type WebSocketManagerOptions } from './ws/WebSocketManager.ts';
 
 import type { Snowflake } from 'https://raw.githubusercontent.com/wioenena-q/dinord-api-types/master/src/global.ts';
-import type { Guild } from '../Structures/Guild/Guild.ts';
-import type { User } from '../Structures/User.ts';
 import type { ToObject } from '../Utils/Types.ts';
+import type { Shard } from './ws/Shard.ts';
 
 /**
  * @class
  * @classdesc Client class for the Discord API
  */
-export class Client extends EventEmitter<ClientEvents> implements ToObject {
+export class Client extends EventEmitter<IClientEvents> implements ToObject {
   #ws: WebSocketManager;
-  #guilds: Collection<Snowflake, Guild>;
-  #users: Collection<Snowflake, User>;
-  #user: ClientUser | null;
+  #guilds: Collection<Snowflake, unknown>;
+  #users: Collection<Snowflake, unknown>;
+  #user: null;
   #options: ClientOptions;
+  #rest = new RESTClient(this);
 
   /**
    *
@@ -53,7 +53,7 @@ export class Client extends EventEmitter<ClientEvents> implements ToObject {
    * @param {string?} [token] - The token to use for the client.
    * @returns {Promise<void>}
    */
-  public login(token?: string): Promise<void> {
+  public async login(token?: string): Promise<void> {
     // If token is not in the options and not sent as a parameter, it will throw an error.
     if (this.#options.token === null && !isString(token)) throw new Error('No token provided');
 
@@ -61,9 +61,9 @@ export class Client extends EventEmitter<ClientEvents> implements ToObject {
     // If token type is not string, it will throw an error.
     if (!isString(this.#options.token)) throw new TypeError('Token must be a string');
 
-    this.#ws.connect();
+    await this.#ws.connect();
 
-    return Promise.resolve(void 0);
+    return void 0;
   }
 
   /**
@@ -81,9 +81,8 @@ export class Client extends EventEmitter<ClientEvents> implements ToObject {
    * Set Client#user to null or an instance from ClientUser
    * @param {ClientUser|null} user - ClientUser instance or null
    */
-  public set user(user: ClientUser | null) {
-    if (user !== null && !isInstanceOf(user, ClientUser))
-      throw new TypeError('user must be an instance of ClientUser');
+  public set user(user: null) {
+    if (user !== null) throw new TypeError('user must be an instance of ClientUser');
 
     this.#user = user;
   }
@@ -119,6 +118,13 @@ export class Client extends EventEmitter<ClientEvents> implements ToObject {
   public get options() {
     return this.#options;
   }
+
+  /**
+   * REST client for requests to the Discord API.
+   */
+  public get rest() {
+    return this.#rest;
+  }
 }
 
 /**
@@ -131,4 +137,11 @@ export interface ClientOptions {
   token?: string;
 }
 
-export type ClientEvents = {};
+export type IClientEvents = {
+  ready: [];
+  shardReady: [Shard];
+};
+export const enum ClientEvents {
+  Ready = 'ready',
+  ShardReady = 'shardReady'
+}
