@@ -29,6 +29,8 @@ export class WebSocketManager implements ToObject, ToString {
   #concurrencyCount = 0;
   #decoder = new TextDecoder();
   #events = new EventManager(this);
+  // Total guild count
+  #totalGuildCount = 0;
 
   /**
    *
@@ -194,6 +196,15 @@ export class WebSocketManager implements ToObject, ToString {
    */
   public get events() {
     return this.#events;
+  }
+
+  public get totalGuildCount() {
+    return this.#totalGuildCount;
+  }
+
+  public set totalGuildCount(count: number) {
+    if (!isNumber(count) || count < 0) throw new TypeError('Total guild count must be a number greater than 0');
+    this.#totalGuildCount = count;
   }
 }
 
