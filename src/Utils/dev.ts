@@ -1,24 +1,22 @@
 // The utility functions here are for the development phase.
 
-import { IntentFlags } from 'https://raw.githubusercontent.com/wioenena-q/dinord-api-types/master/src/api/v10/Intents.ts';
+import { GatewayIntentBits } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 
 export function allIntents() {
   return [
-    IntentFlags.Guilds,
-    IntentFlags.GuildMembers,
-    IntentFlags.GuildBans,
-    IntentFlags.GuildEmojisAndStickers,
-    IntentFlags.GuildIntegrations,
-    IntentFlags.GuildWebhooks,
-    IntentFlags.GuildInvites,
-    IntentFlags.GuildMessageReactions,
-    IntentFlags.GuildMessageTyping,
-    IntentFlags.DirectMessages,
-    IntentFlags.DirectMessageReactions,
-    IntentFlags.DirectMessageTyping,
-    IntentFlags.MessageContent,
-    IntentFlags.GuildScheduledEvents,
-    IntentFlags.AutoModerationConfiguration,
-    IntentFlags.AutoModerationExecution
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildBans,
+    GatewayIntentBits.GuildEmojisAndStickers,
+    GatewayIntentBits.GuildIntegrations,
+    GatewayIntentBits.GuildWebhooks,
+    GatewayIntentBits.GuildInvites,
+    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.GuildMessageTyping,
+    GatewayIntentBits.DirectMessages,
+    GatewayIntentBits.DirectMessageReactions,
+    GatewayIntentBits.DirectMessageTyping,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildScheduledEvents
   ].reduce((p, c) => p + c);
 }
