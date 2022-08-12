@@ -1,0 +1,9 @@
+export { GuildChannelManager } from './GuildChannelManager.ts';
+export { GuildEmojiManager } from './GuildEmojiManager.ts';
+export { GuildMemberManager } from './GuildMemberManager.ts';
+export { GuildPresenceManager } from './GuildPresenceManager.ts';
+export { GuildRoleManager } from './GuildRoleManager.ts';
+export { GuildScheduledEventManager } from './GuildScheduledEventManager.ts';
+export { GuildStageInstanceManager } from './GuildStageInstanceManager.ts';
+export { GuildStickerManager } from './GuildStickerManager.ts';
+export { GuildVoiceStateManager } from './GuildVoiceStateManager.ts';
