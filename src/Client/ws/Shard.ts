@@ -3,9 +3,9 @@ import { URLManager } from '../../Managers/URLManager.ts';
 import { isInstanceOf, toObject } from '../../Utils/Utils.ts';
 // Compression and decompression library
 import { Inflate } from 'https://deno.land/x/compress@v0.4.5/zlib/mod.ts?code';
-import { OPCode } from 'https://raw.githubusercontent.com/wioenena-q/dinord-api-types/master/src/codes/v10/mod.ts';
+import { GatewayOpcodes } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 
-import type { APIPayload } from 'https://raw.githubusercontent.com/wioenena-q/dinord-api-types/master/src/gateway/v10/mod.ts';
+import type { GatewayReceivePayload } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 import type { ToObject, ToString } from '../../Utils/Types.ts';
 import type { WebSocketManager } from './WebSocketManager.ts';
 
@@ -53,7 +53,7 @@ export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToStr
    * @returns {Promise<void>}
    */
   public connect() {
-    // error if ws is not empty or status is Not Disconnected
+    // error if ws is not null or status is not Disconnected
     if (this.#ws !== null || this.#state !== ShardState.Disconnected)
       return Promise.reject(new Error('Already connected'));
 
@@ -115,7 +115,7 @@ export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToStr
     let data!: string | Uint8Array;
 
     // If the data is compressed or encoding etf, the data is treated as a Blob.
-    if (isInstanceOf<Blob>(message.data, Blob)) {
+    if (isInstanceOf(message.data, Blob)) {
       // Convert to byte array
       const bytes = new Uint8Array(await message.data.arrayBuffer());
       // Let's inflate the data if compression is active
@@ -140,7 +140,7 @@ export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToStr
    * Handle the incoming packet
    * @param data - Packet from Gateway
    */
-  #onPacked(data: APIPayload) {
+  #onPacked(data: GatewayReceivePayload) {
     const { op, s, d, t } = data;
 
     // If last sequence is exist, set it
@@ -148,14 +148,14 @@ export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToStr
 
     switch (op) {
       // First handshake
-      case OPCode.Hello: {
-        const { heartbeat_interval } = d as Record<string, unknown>;
+      case GatewayOpcodes.Hello: {
+        const { heartbeat_interval } = d;
         this.#sendHeartbeats(heartbeat_interval as number);
         this.#identify();
         break;
       }
       // Events are triggered
-      case OPCode.Dispatch:
+      case GatewayOpcodes.Dispatch:
         this.#handleEvent(t!, d);
         break;
       default:
@@ -206,7 +206,7 @@ export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToStr
         compress: this.#manager.options.compress
       };
 
-      this.#ws!.send(this.#manager.pack({ op: OPCode.Identify, d }));
+      this.#ws!.send(this.#manager.pack({ op: GatewayOpcodes.Identify, d }));
     }
   }
 
@@ -234,7 +234,7 @@ export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToStr
       this.#heartbeatInterval = setInterval(() => {
         this.#ws!.send(
           this.#manager.pack({
-            op: OPCode.Heartbeat,
+            op: GatewayOpcodes.Heartbeat,
             d: this.#sequence
           })
         );
