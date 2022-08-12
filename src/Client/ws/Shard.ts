@@ -3,7 +3,11 @@ import { URLManager } from '../../Managers/URLManager.ts';
 import { isInstanceOf, toObject } from '../../Utils/Utils.ts';
 // Compression and decompression library
 import { Inflate } from 'https://deno.land/x/compress@v0.4.5/zlib/mod.ts?code';
-import { GatewayDispatchEvents, GatewayOpcodes } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
+import {
+  GatewayDispatchEvents,
+  GatewayOpcodes,
+  type GatewayReadyDispatchData
+} from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 
 import type { GatewayReceivePayload } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 import type { ToObject, ToString } from '../../Utils/Types.ts';
@@ -220,8 +224,14 @@ export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToStr
     const event = this.#manager.events.get(eventName);
 
     if (event === undefined) return;
-    // Emit Ready to this shard.
-    if (eventName === GatewayDispatchEvents.Ready) this.emit(ShardEvents.Ready);
+
+    if (eventName === GatewayDispatchEvents.Ready) {
+      this.#sessionId = (data as GatewayReadyDispatchData).session_id;
+      // Set to total guild count.
+      if (this.#manager.totalGuildCount !== (data as GatewayReadyDispatchData).guilds.length)
+        this.#manager.totalGuildCount = (data as GatewayReadyDispatchData).guilds.length;
+      this.emit(ShardEvents.Ready);
+    }
 
     // Execute event handler with data.
     event.exec(data);
