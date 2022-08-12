@@ -1,12 +1,12 @@
+import { GatewayIntentBits } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 import { config } from 'https://deno.land/x/dotenv@v3.2.0/mod.ts?code';
-import { IntentFlags } from 'https://raw.githubusercontent.com/wioenena-q/dinord-api-types/master/src/api/v10/Intents.ts';
 import { Client } from '../src/Client/Client.ts';
 
 config({ export: true });
 
 const client = new Client({
   ws: {
-    intents: IntentFlags.Guilds,
+    intents: GatewayIntentBits.Guilds,
     shardCount: 1
   }
 });
