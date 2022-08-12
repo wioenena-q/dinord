@@ -1,10 +1,13 @@
-import { IntentFlags } from 'https://raw.githubusercontent.com/wioenena-q/dinord-api-types/master/src/api/v10/mod.ts';
 import { Collection } from '../../deps.ts';
 import { URLManager } from '../../Managers/URLManager.ts';
 import { isInstanceOf, isNumber, isObject, isString, toObject, wait } from '../../Utils/Utils.ts';
-// Etf unpacking and packing library
+// Packing and unpacking library for ETF encoding
 import { pack as ETFPack, unpack as ETFUnpack } from 'https://deno.land/x/void@1.0.4/mod.ts';
 
+import {
+  GatewayIntentBits,
+  RESTGetAPIGatewayBotResult
+} from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 import type { ToObject, ToString } from '../../Utils/Types.ts';
 import { ClientEvents, type Client } from '../Client.ts';
 import { Shard, ShardState } from './Shard.ts';
@@ -65,7 +68,9 @@ export class WebSocketManager implements ToObject, ToString {
     // Set state to connecting
     this.#state = WebSocketManagerState.Connecting;
     // Get concurrency limit and recommended shard amount
-    const { shards, session_start_limit } = (await this.#client.rest.get(URLManager.gatewayBot())) as any; // TODO: remove any
+    const { shards, session_start_limit } = await this.#client.rest.get<RESTGetAPIGatewayBotResult>(
+      URLManager.gatewayBot()
+    );
     this.#maxConcurrency = session_start_limit.max_concurrency;
     if (this.#options.shardCount === 'auto') this.#options.shardCount = shards;
 
@@ -128,7 +133,7 @@ export class WebSocketManager implements ToObject, ToString {
    * @returns
    */
   public unpack(data: string | Uint8Array) {
-    return this.#options.encoding === 'etf' && isInstanceOf<Uint8Array>(data, Uint8Array)
+    return this.#options.encoding === 'etf' && isInstanceOf(data, Uint8Array)
       ? ETFUnpack(data)
       : JSON.parse(data as string);
   }
@@ -199,7 +204,7 @@ export interface WebSocketManagerOptions {
   largeThreshold?: number;
   compress?: boolean;
   encoding?: WSEncoding;
-  intents: IntentFlags;
+  intents: GatewayIntentBits;
 }
 
 export type WSEncoding = 'json' | 'etf';
