@@ -3,7 +3,7 @@ import { URLManager } from '../../Managers/URLManager.ts';
 import { isInstanceOf, toObject } from '../../Utils/Utils.ts';
 // Compression and decompression library
 import { Inflate } from 'https://deno.land/x/compress@v0.4.5/zlib/mod.ts?code';
-import { GatewayOpcodes } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
+import { GatewayDispatchEvents, GatewayOpcodes } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 
 import type { GatewayReceivePayload } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 import type { ToObject, ToString } from '../../Utils/Types.ts';
@@ -212,16 +212,19 @@ export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToStr
 
   /**
    * Handle events
-   * @param event - Event name
+   * @param eventName - Event name
    * @param data - Event data
    */
-  #handleEvent(event: string, data: unknown) {
-    switch (event) {
-      case 'READY': {
-        this.emit(ShardEvents.Ready);
-        break;
-      }
-    }
+  #handleEvent(eventName: GatewayDispatchEvents, data: unknown) {
+    // Get event handler.
+    const event = this.#manager.events.get(eventName);
+
+    if (event === undefined) return;
+    // Emit Ready to this shard.
+    if (eventName === GatewayDispatchEvents.Ready) this.emit(ShardEvents.Ready);
+
+    // Execute event handler with data.
+    event.exec(data);
   }
 
   /**
