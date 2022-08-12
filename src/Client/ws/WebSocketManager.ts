@@ -10,6 +10,7 @@ import {
 } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 import type { ToObject, ToString } from '../../Utils/Types.ts';
 import { ClientEvents, type Client } from '../Client.ts';
+import { EventManager } from './Events/EventManager.ts';
 import { Shard, ShardState } from './Shard.ts';
 
 /**
@@ -27,6 +28,7 @@ export class WebSocketManager implements ToObject, ToString {
   // Increased concurrency count on each shard connection
   #concurrencyCount = 0;
   #decoder = new TextDecoder();
+  #events = new EventManager(this);
 
   /**
    *
@@ -56,6 +58,9 @@ export class WebSocketManager implements ToObject, ToString {
       { largeThreshold: 50, compress: false, encoding: 'json', shardCount: 'auto' },
       options
     ) as Required<WebSocketManagerOptions>;
+
+    // Register all events.
+    this.#events.registerAll();
   }
 
   /**
@@ -147,7 +152,7 @@ export class WebSocketManager implements ToObject, ToString {
   }
 
   toObject() {
-    return toObject(this, ['shards', 'state', 'options']);
+    return toObject(this, ['shards', 'state', 'options', 'events']);
   }
 
   public toString() {
@@ -181,6 +186,14 @@ export class WebSocketManager implements ToObject, ToString {
    */
   public get decoder() {
     return this.#decoder;
+  }
+
+  /**
+   *
+   * Manager class for gateway dispatch events
+   */
+  public get events() {
+    return this.#events;
   }
 }
 
