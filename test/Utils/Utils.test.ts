@@ -113,7 +113,7 @@ Deno.test('isInstanceOf', () => {
 
   let v: unknown = {};
 
-  if (!isInstanceOf<Class>(v, Class)) {
+  if (!isInstanceOf(v, Class)) {
     // @ts-expect-error - not instance of Class
     v.prop;
   }
