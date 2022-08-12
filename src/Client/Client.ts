@@ -4,7 +4,7 @@ import { isObject, isString, toObject } from '../Utils/Utils.ts';
 import { RESTClient } from './RESTClient.ts';
 import { WebSocketManager, type WebSocketManagerOptions } from './ws/WebSocketManager.ts';
 
-import type { Snowflake } from 'https://raw.githubusercontent.com/wioenena-q/dinord-api-types/master/src/global.ts';
+import type { Snowflake } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 import type { ToObject } from '../Utils/Types.ts';
 import type { Shard } from './ws/Shard.ts';
 
