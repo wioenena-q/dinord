@@ -42,7 +42,7 @@ export class RESTClient {
    * @param {RequestInit?} [options]
    * @returns {Promise<unknown>}
    */
-  public async get(url: string, options?: RequestInit): Promise<unknown> {
+  public async get<T>(url: string, options?: RequestInit): Promise<T> {
     const response = await fetch(this.#createRequest(url, options));
     if (response.status === 200) {
       return response.json();
