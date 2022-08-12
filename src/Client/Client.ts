@@ -5,6 +5,7 @@ import { RESTClient } from './RESTClient.ts';
 import { WebSocketManager, type WebSocketManagerOptions } from './ws/WebSocketManager.ts';
 
 import type { Snowflake } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
+import type { Guild } from '../Structures/Guild/Guild.ts';
 import type { ToObject } from '../Utils/Types.ts';
 import type { Shard } from './ws/Shard.ts';
 
@@ -14,8 +15,8 @@ import type { Shard } from './ws/Shard.ts';
  */
 export class Client extends EventEmitter<IClientEvents> implements ToObject {
   #ws: WebSocketManager;
-  #guilds: Collection<Snowflake, unknown>;
-  #users: Collection<Snowflake, unknown>;
+  #guilds = new Collection<Snowflake, Guild>();
+  #users = new Collection<Snowflake, unknown>();
   #user: null;
   #options: ClientOptions;
   #rest = new RESTClient(this);
@@ -29,10 +30,6 @@ export class Client extends EventEmitter<IClientEvents> implements ToObject {
     if (!isObject(options)) throw new TypeError('Client options must be an object');
 
     this.#options = Object.assign({ token: null }, options);
-
-    // Create caches
-    this.#guilds = new Collection();
-    this.#users = new Collection();
 
     // Set user to null. Populated when the Ready event is triggered
     this.#user = null;
@@ -139,9 +136,15 @@ export interface ClientOptions {
 
 export type IClientEvents = {
   ready: [];
+  guildCreate: [Guild];
+  guildDelete: [Guild];
+  guildUpdate: [Guild, Guild];
   shardReady: [Shard];
 };
 export const enum ClientEvents {
   Ready = 'ready',
+  GuildCreate = 'guildCreate',
+  GuildDelete = 'guildDelete',
+  GuildUpdate = 'guildUpdate',
   ShardReady = 'shardReady'
 }
