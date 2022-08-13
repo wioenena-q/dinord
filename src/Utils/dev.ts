@@ -11,12 +11,17 @@ export function allIntents() {
     GatewayIntentBits.GuildIntegrations,
     GatewayIntentBits.GuildWebhooks,
     GatewayIntentBits.GuildInvites,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.GuildPresences,
+    GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildMessageReactions,
     GatewayIntentBits.GuildMessageTyping,
     GatewayIntentBits.DirectMessages,
     GatewayIntentBits.DirectMessageReactions,
     GatewayIntentBits.DirectMessageTyping,
     GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildScheduledEvents
-  ].reduce((p, c) => p + c);
+    GatewayIntentBits.GuildScheduledEvents,
+    1 << 20,
+    1 << 21
+  ].reduce((p, c) => p | c);
 }
