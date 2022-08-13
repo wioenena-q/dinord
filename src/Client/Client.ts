@@ -79,7 +79,7 @@ export class Client extends EventEmitter<IClientEvents> {
   }
 
   public [Symbol.for('Deno.customInspect')](inspect: typeof Deno.inspect, options: Deno.InspectOptions) {
-    return inspect(toObject(this, ['ws', 'user', 'guilds', 'users', 'options']), options);
+    return inspect(toObject(this, ['ws', 'user', 'guilds', 'users', 'options', 'rest']), options);
   }
 
   /**
