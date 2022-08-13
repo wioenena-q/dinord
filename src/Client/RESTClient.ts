@@ -1,4 +1,4 @@
-import { isObject } from '../Utils/Utils.ts';
+import { isObject, toObject, wait } from '../Utils/Utils.ts';
 import type { Client } from './Client.ts';
 
 /**
@@ -7,6 +7,7 @@ import type { Client } from './Client.ts';
  */
 export class RESTClient {
   #client: Client;
+  #buckets = new Map<string, { remaining: number; requestCount: number; resetAfter: number }>();
 
   /**
    *
@@ -17,23 +18,81 @@ export class RESTClient {
   }
 
   /**
-   * Create a Request object that already has the Authentication header field for the given url.
-   * @param url - URL to send the request to
-   * @param options - Options for the request
-   * @returns {Request}
+   * This method cares about the rate limit when making a request.
+   * @param url - The url to request
+   * @param options - The options for request
+   * @returns - The response from the request
    */
-  #createRequest(url: Request | string, options?: RequestInit) {
+  async #request(url: string, method: HTTPMethod, options: RequestInit = {}): Promise<Response> {
+    // If options is exists and is not object, throw error
     if (options !== undefined && !isObject<RequestInit>(options))
       throw new TypeError('RESTClient request options must be an object');
 
+    // Create request options with Authorization header
     const _options = {
-      ...(options ?? {}),
+      ...options,
+      method,
       headers: {
-        ...(options?.headers ?? {}),
+        'Content-Type': 'application/json',
+        ...(options.headers ?? {}),
         Authorization: `Bot ${this.#client.options.token}`
       }
     };
-    return new Request(url, _options);
+
+    // Create the request
+    const response = await fetch(url, _options);
+    // Get the ratelimit headers
+    // prettier-ignore
+    const xBucket = response.headers.get('X-RateLimit-Bucket'),
+          xRemaining = response.headers.get('X-RateLimit-Remaining'),
+          xResetAfter = response.headers.get('X-RateLimit-Reset-After');
+
+    // If the rate limit headers are present, update or create a bucket
+    if (xBucket && xRemaining && xResetAfter) {
+      // Get bucket from cache
+      const bucket = this.#buckets.get(xBucket);
+
+      // If not in cache, create a new bucket
+      if (!bucket) {
+        this.#buckets.set(xBucket, {
+          remaining: parseInt(xRemaining),
+          requestCount: 1,
+          resetAfter: +xResetAfter * 1000
+        });
+        this.#debug(`Bucket ${xBucket} created`);
+      } else {
+        // If in cache, update the bucket
+
+        // If the remaining right has expired, wait for the reset time and resend the request
+        if (bucket.remaining === 0) {
+          this.#debug(`Bucket ${xBucket} is full, waiting ${bucket.resetAfter}ms`);
+          // Wait reset after time
+          await wait(bucket.resetAfter);
+          // Delete bucket from cache
+          this.#buckets.delete(xBucket);
+          // Resend request
+          return this.#request(url, method, options);
+        }
+        bucket.requestCount++; // Increate the request count
+        bucket.remaining--; // Decrease the remaining requests
+      }
+    }
+
+    if (response.status === 200) return response;
+    else if (response.status === 429) {
+      // If the response status is 429, wait for the retry time and resend the request
+
+      const retryAfter = response.headers.get('Retry-After');
+
+      if (retryAfter) {
+        this.#debug(`Rate limit exceeded, waiting ${+retryAfter * 1000}ms`);
+        await wait(+retryAfter * 1000);
+        return this.#request(url, method, options);
+      } else throw new Error('Rate limit exceeded');
+    } else if (response.status === 403) {
+      // Unauthorized
+      throw new Error('Unauthorized');
+    } else throw new Error(`${response.status} ${response.statusText}`);
   }
 
   /**
@@ -43,12 +102,8 @@ export class RESTClient {
    * @returns {Promise<unknown>}
    */
   public async get<T>(url: string, options?: RequestInit): Promise<T> {
-    const response = await fetch(this.#createRequest(url, options));
-    if (response.status === 200) {
-      return response.json();
-    } else {
-      throw new Error(`${response.status} ${response.statusText}`);
-    }
+    const response = await this.#request(url, HTTPMethod.Get, options);
+    return response.json();
   }
 
   /**
@@ -58,7 +113,7 @@ export class RESTClient {
    * @returns {Promise<unknown>}
    */
   public async post(url: string, options?: RequestInit) {
-    throw new Error('Not implemented');
+    // TODO: Implement
   }
 
   /**
@@ -68,7 +123,7 @@ export class RESTClient {
    * @returns {Promise<unknown>}
    */
   public async put(url: string, options?: RequestInit) {
-    throw new Error('Not implemented');
+    // TODO: Implement
   }
 
   /**
@@ -78,7 +133,7 @@ export class RESTClient {
    * @returns {Promise<unknown>}
    */
   public async delete(url: string, options?: RequestInit) {
-    throw new Error('Not implemented');
+    // TODO: Implement
   }
 
   /**
@@ -87,11 +142,31 @@ export class RESTClient {
    * @param {RequestInit?} [options]
    * @returns {Promise<unknown>}
    */
-  public async patch(url: string, options?: RequestInit) {
-    throw new Error('Not implemented');
+  public async patch(url: string, options: RequestInit = {}) {
+    if (options.body) options.body = JSON.stringify(options.body);
+    const response = await this.#request(url, HTTPMethod.Patch, options);
+    return response.json();
+  }
+
+  #debug(message: string) {
+    this.#client.debug(`[Dinord => RESTClient]: ${message}`);
+  }
+
+  public [Symbol.for('Deno.customInspect')](inspect: typeof Deno.inspect, options: Deno.InspectOptions) {
+    return inspect(toObject(this, ['client']), options);
   }
 
   public get client() {
     return this.#client;
   }
+}
+
+export type HTTPMethods = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+
+export const enum HTTPMethod {
+  Get = 'GET',
+  Post = 'POST',
+  Put = 'PUT',
+  Delete = 'DELETE',
+  Patch = 'PATCH'
 }
