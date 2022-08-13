@@ -1,3 +1,4 @@
+import { Snowflake } from 'https://deno.land/x/discord_api_types@0.37.2/globals.ts';
 import type { WSEncoding } from '../Client/ws/WebSocketManager.ts';
 
 /**
@@ -28,7 +29,7 @@ export class URLManager extends null {
    * API base url
    * @returns {string}
    */
-  public static apiBase() {
+  public static APIBase() {
     return `https://discord.com/api/v${this.#api.version}`;
   }
 
@@ -37,7 +38,7 @@ export class URLManager extends null {
    * @returns {string}
    */
   public static gatewayBot() {
-    return this.join(this.apiBase(), 'gateway', 'bot');
+    return this.join(this.APIBase(), 'gateway', 'bot');
   }
 
   /**
@@ -49,7 +50,12 @@ export class URLManager extends null {
     if (this.#ws.compress) base += '&compress=zlib-stream';
     return base;
   }
+
+  public static getGuildRoles(guildId: Snowflake) {
+    return this.join(this.APIBase(), 'guilds', guildId, 'roles');
+  }
 }
+
 /**
  * @typedef {Object} URLManagerInitOptions
  * @property {URLManagerInitAPIOptions} api - Options for api
