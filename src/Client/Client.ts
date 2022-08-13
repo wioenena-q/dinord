@@ -6,14 +6,13 @@ import { WebSocketManager, type WebSocketManagerOptions } from './ws/WebSocketMa
 
 import type { Snowflake } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 import type { Guild } from '../Structures/Guild/Guild.ts';
-import type { ToObject } from '../Utils/Types.ts';
 import type { Shard } from './ws/Shard.ts';
 
 /**
  * @class
  * @classdesc Client class for the Discord API
  */
-export class Client extends EventEmitter<IClientEvents> implements ToObject {
+export class Client extends EventEmitter<IClientEvents> {
   #ws: WebSocketManager;
   #guilds = new Collection<Snowflake, Guild>();
   #users = new Collection<Snowflake, unknown>();
@@ -70,8 +69,17 @@ export class Client extends EventEmitter<IClientEvents> implements ToObject {
     this.#ws.close();
   }
 
-  public toObject() {
-    return toObject(this, ['ws', 'user', 'guilds', 'users', 'options']);
+  /**
+   *
+   * If the client's debugMode option is active, it triggers the client's debug event and sends messages.
+   * @param message - Debug message to send
+   */
+  public debug(message: string) {
+    this.emit(ClientEvents.Debug, message);
+  }
+
+  public [Symbol.for('Deno.customInspect')](inspect: typeof Deno.inspect, options: Deno.InspectOptions) {
+    return inspect(toObject(this, ['ws', 'user', 'guilds', 'users', 'options']), options);
   }
 
   /**
@@ -126,8 +134,8 @@ export class Client extends EventEmitter<IClientEvents> implements ToObject {
 
 /**
  * @typedef {Object} ClientOptions
- * @property {string} [token] - Token to use for the client. Not required if the token will be specified at login method
  * @property {WebSocketManagerOptions} [ws] - Options for the WebSocketManager
+ * @property {string} [token] - Token to use for the client. Not required if the token will be specified at login method
  */
 export interface ClientOptions {
   ws: WebSocketManagerOptions;
@@ -140,11 +148,13 @@ export type IClientEvents = {
   guildDelete: [Guild];
   guildUpdate: [Guild, Guild];
   shardReady: [Shard];
+  debug: [string];
 };
 export const enum ClientEvents {
   Ready = 'ready',
   GuildCreate = 'guildCreate',
   GuildDelete = 'guildDelete',
   GuildUpdate = 'guildUpdate',
-  ShardReady = 'shardReady'
+  ShardReady = 'shardReady',
+  Debug = 'debug'
 }
