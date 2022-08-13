@@ -3,7 +3,7 @@ export const getTimestampFromId = (id: string): number => {
   return Number((bId >> 22n) + 1420070400000n);
 };
 
-export const isArray = (val: unknown): val is unknown[] => isInstanceOf(val, Array) && Array.isArray(val);
+export const isArray = <T>(val: unknown): val is T[] => isInstanceOf(val, Array) && Array.isArray(val);
 
 export const isString = (val: unknown): val is string => typeof val === 'string';
 
@@ -20,6 +20,8 @@ export const isInstanceOf = <T extends { new (...args: never[]): unknown }>(
   val: unknown,
   cls: T
 ): val is InstanceType<T> => val instanceof cls;
+
+export const isBigInt = (val: unknown): val is bigint => typeof val === 'bigint';
 
 export const toObject = (target: any, keys: string[]): Record<PropertyKey, unknown> => {
   // https://stackoverflow.com/questions/33605775/es6-dynamic-class-names
