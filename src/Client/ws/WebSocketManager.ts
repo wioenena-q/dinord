@@ -8,7 +8,7 @@ import {
   GatewayIntentBits,
   RESTGetAPIGatewayBotResult
 } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
-import type { ToObject, ToString } from '../../Utils/Types.ts';
+import type { ToString } from '../../Utils/Types.ts';
 import { ClientEvents, type Client } from '../Client.ts';
 import { EventManager } from './Events/EventManager.ts';
 import { Shard, ShardState } from './Shard.ts';
@@ -16,9 +16,9 @@ import { Shard, ShardState } from './Shard.ts';
 /**
  * @class
  * @extends {EventEmitter}
- * @implements {ToObject, ToString}
+ * @implements {ToString}
  */
-export class WebSocketManager implements ToObject, ToString {
+export class WebSocketManager implements ToString {
   #client: Client;
   // Maximum concurrency. null if new instance created
   #maxConcurrency: number | null = null;
@@ -70,6 +70,7 @@ export class WebSocketManager implements ToObject, ToString {
    * @returns
    */
   public async connect() {
+    this.#debug(`Connecting to gateway...`);
     // If the state is already connected, return
     if (this.#state === WebSocketManagerState.Connected) return Promise.resolve();
     // Set state to connecting
@@ -80,13 +81,14 @@ export class WebSocketManager implements ToObject, ToString {
     );
     this.#maxConcurrency = session_start_limit.max_concurrency;
     if (this.#options.shardCount === 'auto') this.#options.shardCount = shards;
-
+    const connectTime = Date.now();
     // Shards
     this.#createShards();
     await this.#tryConnectShards();
 
     // Set state to connected
     this.#state = WebSocketManagerState.Connected;
+    this.#debug(`Connected to gateway took ${Date.now() - connectTime}ms.`);
   }
 
   /**
@@ -153,12 +155,19 @@ export class WebSocketManager implements ToObject, ToString {
     throw new Error('Not implemented');
   }
 
-  toObject() {
-    return toObject(this, ['shards', 'state', 'options', 'events']);
-  }
-
   public toString() {
     return `${this.constructor.name} (state ${this.#state}, shards: ${this.#shards.size})`;
+  }
+
+  #debug(message: string) {
+    this.#client.debug(`[Dinord => WebSocketManager]: ${message}`);
+  }
+
+  public [Symbol.for('Deno.customInspect')](inspect: typeof Deno.inspect, options: Deno.InspectOptions) {
+    return inspect(
+      toObject(this, ['client', 'shards', 'state', 'options', 'decoder', 'events', 'totalGuildCount', 'ping']),
+      options
+    );
   }
 
   public get client() {
@@ -198,6 +207,9 @@ export class WebSocketManager implements ToObject, ToString {
     return this.#events;
   }
 
+  /**
+   * Total guild size
+   */
   public get totalGuildCount() {
     return this.#totalGuildCount;
   }
@@ -205,6 +217,14 @@ export class WebSocketManager implements ToObject, ToString {
   public set totalGuildCount(count: number) {
     if (!isNumber(count) || count < 0) throw new TypeError('Total guild count must be a number greater than 0');
     this.#totalGuildCount = count;
+  }
+
+  /**
+   * Ping of Client
+   */
+  public get ping() {
+    const pings = this.#shards.reduce((acc, s) => s.ping + acc, 0);
+    return pings > 0 ? pings / this.#shards.size : -1;
   }
 }
 
