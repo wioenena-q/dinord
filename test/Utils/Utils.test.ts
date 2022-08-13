@@ -1,6 +1,7 @@
 import { assertEquals, assertObjectMatch } from 'https://deno.land/std/testing/asserts.ts';
 import {
   isArray,
+  isBigInt,
   isBoolean,
   isFunction,
   isInstanceOf,
@@ -117,6 +118,18 @@ Deno.test('isInstanceOf', () => {
     // @ts-expect-error - not instance of Class
     v.prop;
   }
+});
+
+Deno.test('isBigInt', () => {
+  assertEquals(isBigInt(BigInt(1)), true);
+  assertEquals(isBigInt(1), false);
+  assertEquals(isBigInt(''), false);
+  assertEquals(isBigInt({}), false);
+  assertEquals(isBigInt(true), false);
+  assertEquals(
+    isBigInt(() => {}),
+    false
+  );
 });
 
 Deno.test('toObject', () => {
