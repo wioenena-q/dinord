@@ -10,15 +10,15 @@ import {
 } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 
 import type { GatewayReceivePayload } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
-import type { ToObject, ToString } from '../../Utils/Types.ts';
+import type { ToString } from '../../Utils/Types.ts';
 import type { WebSocketManager } from './WebSocketManager.ts';
 
 /**
  * @class
  * @extends {EventEmitter<IShardEvents>}
- * @implements {ToObject, ToString}
+ * @implements {ToString}
  */
-export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToString {
+export class Shard extends EventEmitter<IShardEvents> implements ToString {
   #id: number;
   #manager: WebSocketManager;
   #sessionId: string | null = null;
@@ -31,6 +31,9 @@ export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToStr
   #sequence: number | null = null;
   // To inflate if compression option is enabled, otherwise null
   #inflate: Inflate | null = null;
+  // Time to when the last heartbeat was sent
+  #lastPingTimestamp: number | null = null;
+  #ping = -1;
 
   /**
    *
@@ -88,6 +91,7 @@ export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToStr
   #onOpen(event: Event) {
     // Set state to Connected
     this.#state = ShardState.Connected;
+    this.#debug(`Connected`);
   }
 
   /**
@@ -156,14 +160,18 @@ export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToStr
         const { heartbeat_interval } = d;
         this.#sendHeartbeats(heartbeat_interval as number);
         this.#identify();
+        this.#debug(`Ready`);
         break;
       }
       // Events are triggered
       case GatewayOpcodes.Dispatch:
         this.#handleEvent(t!, d);
         break;
+      case GatewayOpcodes.HeartbeatAck:
+        this.#heartbeatACK();
+        break;
       default:
-        console.log(`Shard: ${this.#id} Unknown opcode: ${op}`);
+        this.#debug(`Unknown opcode: ${op}`);
         break;
     }
   }
@@ -209,8 +217,12 @@ export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToStr
         intents: this.#manager.options.intents,
         compress: this.#manager.options.compress
       };
-
       this.#ws!.send(this.#manager.pack({ op: GatewayOpcodes.Identify, d }));
+      this.#debug(
+        `[IDENTIFY] Shard ${this.id}/${this.#manager.options.shardCount} with intents ${
+          this.#manager.options.intents
+        }`
+      );
     }
   }
 
@@ -245,6 +257,8 @@ export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToStr
   #sendHeartbeats(ms: number): void {
     if (this.#heartbeatInterval === null && this.#state === ShardState.Connected && this.#ws !== null) {
       this.#heartbeatInterval = setInterval(() => {
+        this.#lastPingTimestamp = Date.now();
+        this.#debug(`Sent heartbeat to gateway.`);
         this.#ws!.send(
           this.#manager.pack({
             op: GatewayOpcodes.Heartbeat,
@@ -255,8 +269,18 @@ export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToStr
     }
   }
 
-  toObject() {
-    return toObject(this, ['id', 'manager', 'toObject', 'toString']);
+  #heartbeatACK() {
+    const latency = Date.now() - (this.#lastPingTimestamp ?? 0);
+    this.#ping = latency;
+    this.#debug(`Received heartbeat ACK. Latency: ${latency}ms`);
+  }
+
+  #debug(message: string) {
+    this.#manager.client.debug(`[Dinord => Shard (${this.#id})]: ${message}`);
+  }
+
+  public [Symbol.for('Deno.customInspect')](inspect: typeof Deno.inspect, options: Deno.InspectOptions) {
+    return inspect(toObject(this, ['id', 'manager', 'sessionId', 'state', 'ping']), options);
   }
 
   public toString() {
@@ -293,6 +317,14 @@ export class Shard extends EventEmitter<IShardEvents> implements ToObject, ToStr
    */
   public get state() {
     return this.#state;
+  }
+
+  /**
+   *
+   * Ping of this shard
+   */
+  public get ping() {
+    return this.#ping;
   }
 }
 
