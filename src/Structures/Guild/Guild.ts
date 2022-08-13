@@ -37,44 +37,44 @@ export class Guild extends Base {
    * ID of the guild.
    */
   public readonly id!: Snowflake;
-  private declare _available: boolean;
-  private declare _name: string | null;
-  private declare _icon: string | null;
-  private declare _splash: string | null;
-  private declare _discoverySplash: string | null;
-  private declare _owner: boolean;
-  private declare _ownerId: Snowflake | null;
-  private declare _afkChannelId: Snowflake | null;
-  private declare _afkTimeout: number;
-  private declare _widgetEnabled: boolean;
-  private declare _widgetChannelId: Snowflake | null;
-  private declare _verificationLevel: GuildVerificationLevel | null;
-  private declare _defaultMessageNotifications: GuildDefaultMessageNotifications | null;
-  private declare _explicitContentFilter: GuildExplicitContentFilter | null;
-  private declare _features: GuildFeature[] | null;
-  private declare _mfaLevel: GuildMFALevel | null;
-  private declare _applicationId: Snowflake | null;
-  private declare _systemChannelId: Snowflake | null;
-  private declare _systemChannelFlags: GuildSystemChannelFlags | null;
-  private declare _rulesChannelId: Snowflake | null;
-  private declare _maxPresences: number | null;
-  private declare _maxMembers: number | null;
-  private declare _vanityURLCode: string | null;
-  private declare _description: string | null;
-  private declare _banner: string | null;
-  private declare _premiumTier: GuildPremiumTier | null;
-  private declare _premiumSubscriptionCount: number | null;
-  private declare _preferredLocale: string | null;
-  private declare _publicUpdatesChannelId: Snowflake | null;
-  private declare _maxVideoChannelUsers: number | null;
-  private declare _approximateMemberCount: number | null;
-  private declare _approximatePresenceCount: number | null;
-  private declare _welcomeScreen: unknown; // TODO: Implement
-  private declare _nsfwLevel: GuildNSFWLevel | null;
-  private declare _premiumProgressBarEnabled: boolean;
-  private declare _joinedAt: Date | null;
-  private declare _large: boolean;
-  private declare _memberCount: number | null;
+  protected declare _available: boolean;
+  protected declare _name: string | null;
+  protected declare _icon: string | null;
+  protected declare _splash: string | null;
+  protected declare _discoverySplash: string | null;
+  protected declare _owner: boolean;
+  protected declare _ownerId: Snowflake | null;
+  protected declare _afkChannelId: Snowflake | null;
+  protected declare _afkTimeout: number;
+  protected declare _widgetEnabled: boolean;
+  protected declare _widgetChannelId: Snowflake | null;
+  protected declare _verificationLevel: GuildVerificationLevel | null;
+  protected declare _defaultMessageNotifications: GuildDefaultMessageNotifications | null;
+  protected declare _explicitContentFilter: GuildExplicitContentFilter | null;
+  protected declare _features: GuildFeature[] | null;
+  protected declare _mfaLevel: GuildMFALevel | null;
+  protected declare _applicationId: Snowflake | null;
+  protected declare _systemChannelId: Snowflake | null;
+  protected declare _systemChannelFlags: GuildSystemChannelFlags | null;
+  protected declare _rulesChannelId: Snowflake | null;
+  protected declare _maxPresences: number | null;
+  protected declare _maxMembers: number | null;
+  protected declare _vanityURLCode: string | null;
+  protected declare _description: string | null;
+  protected declare _banner: string | null;
+  protected declare _premiumTier: GuildPremiumTier | null;
+  protected declare _premiumSubscriptionCount: number | null;
+  protected declare _preferredLocale: string | null;
+  protected declare _publicUpdatesChannelId: Snowflake | null;
+  protected declare _maxVideoChannelUsers: number | null;
+  protected declare _approximateMemberCount: number | null;
+  protected declare _approximatePresenceCount: number | null;
+  protected declare _welcomeScreen: unknown; // TODO: Implement
+  protected declare _nsfwLevel: GuildNSFWLevel | null;
+  protected declare _premiumProgressBarEnabled: boolean;
+  protected declare _joinedAt: Date | null;
+  protected declare _large: boolean;
+  protected declare _memberCount: number | null;
 
   /**
    * A manager of the roles of this guild.
@@ -117,7 +117,7 @@ export class Guild extends Base {
     super(client);
 
     // Constant property
-    this.id = data.id;
+    Object.defineProperty(this, 'id', { value: data.id });
 
     this.patch(data);
   }
@@ -167,15 +167,15 @@ export class Guild extends Base {
     this._memberCount = 'member_count' in data ? data.member_count : null;
 
     if ('roles' in data) {
-      // TODO: Implement roles
+      for (const role of data.roles) this.roles.add(role);
     }
 
     if ('emojis' in data) {
-      // TODO: Implement emojis
+      for (const emoji of data.emojis) this.emojis.add(emoji);
     }
 
     if ('stickers' in data) {
-      // TODO: Implement stickers
+      for (const sticker of data.stickers) this.stickers.add(sticker);
     }
 
     if ('channels' in data) {
@@ -217,6 +217,7 @@ export class Guild extends Base {
   [Symbol.for('Deno.customInspect')](inspect: typeof Deno.inspect, options: Deno.InspectOptions) {
     return inspect(
       toObject(this, [
+        'client',
         'id',
         'available',
         'name',
