@@ -1,7 +1,7 @@
 import type { Client } from '../Client/Client.ts';
-import type { Clonable, Patchable, ToJSON, ToObject, ToString, Updatable } from '../Utils/Types.ts';
+import type { Clonable, Patchable, ToJSON, ToString, Updatable } from '../Utils/Types.ts';
 
-export abstract class Base implements ToJSON, ToString, ToObject, Patchable, Clonable, Updatable {
+export abstract class Base implements ToJSON, ToString, Patchable, Clonable, Updatable {
   #client: Client;
 
   public constructor(client: Client) {
@@ -27,14 +27,9 @@ export abstract class Base implements ToJSON, ToString, ToObject, Patchable, Clo
     return clone;
   }
 
-  public [Symbol.for('Deno.customInspect')](inspect: typeof Deno.inspect, options: Deno.InspectOptions) {
-    return inspect(this.toObject(), options);
-  }
-
   public abstract toJSON(): Record<string, unknown>;
   public abstract toString(): string;
   public abstract patch(data: unknown): void;
-  public abstract toObject(): Record<PropertyKey, unknown>;
 
   public get client() {
     return this.#client;
