@@ -1,3 +1,4 @@
+import { DiscordAPIError } from '../Errors/DiscordAPIError.ts';
 import { isObject, toObject, wait } from '../Utils/Utils.ts';
 import type { Client } from './Client.ts';
 
@@ -78,8 +79,7 @@ export class RESTClient {
       }
     }
 
-    if (response.status === 200) return response;
-    else if (response.status === 429) {
+    if (response.status === 429) {
       // If the response status is 429, wait for the retry time and resend the request
 
       const retryAfter = response.headers.get('Retry-After');
@@ -88,11 +88,20 @@ export class RESTClient {
         this.#debug(`Rate limit exceeded, waiting ${+retryAfter * 1000}ms`);
         await wait(+retryAfter * 1000);
         return this.#request(url, method, options);
-      } else throw new Error('Rate limit exceeded');
-    } else if (response.status === 403) {
-      // Unauthorized
-      throw new Error('Unauthorized');
-    } else throw new Error(`${response.status} ${response.statusText}`);
+      } else
+        throw new DiscordAPIError({
+          message: 'Rate limit exceeded',
+          method,
+          status: response.status,
+          url
+        });
+    }
+
+    if (response.status === 200 || response.ok) return response;
+    else {
+      const error = await response.json();
+      throw new DiscordAPIError({ message: error.message, method, status: response.status, url, ...error });
+    }
   }
 
   /**
@@ -133,7 +142,8 @@ export class RESTClient {
    * @returns {Promise<unknown>}
    */
   public async delete(url: string, options?: RequestInit) {
-    // TODO: Implement
+    const response = await this.#request(url, HTTPMethod.Delete, options);
+    return response.json();
   }
 
   /**
