@@ -2,10 +2,6 @@ export interface ToJSON {
   toJSON(): Record<string, unknown>;
 }
 
-export interface ToObject {
-  toObject(): Record<PropertyKey, unknown>;
-}
-
 export interface ToString {
   toString(): string;
 }
@@ -25,3 +21,5 @@ export interface Clonable {
 export interface Updatable {
   update(data: unknown): this;
 }
+
+export type MaybeArray<T> = T | T[];
