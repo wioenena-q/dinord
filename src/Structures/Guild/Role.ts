@@ -1,8 +1,9 @@
-import { toObject } from '../../Utils/Utils.ts';
+import { defineReadonlyProperty, toObject } from '../../Utils/Utils.ts';
 import { Base } from '../Base.ts';
 import { PermissionBitField } from '../PermissionBitField.ts';
 
 import type { APIRole, Snowflake } from '../../deps.ts';
+import { DiscordSnowflake } from '../DiscordSnowflake.ts';
 import type { Guild } from './Guild.ts';
 
 /**
@@ -11,11 +12,18 @@ import type { Guild } from './Guild.ts';
  * @extends {Base}
  */
 export class Role extends Base {
-  private declare _guild: Guild;
+  /**
+   * Guild this role is in.
+   */
+  public declare readonly guild: Guild;
   /**
    * ID of this role.
    */
-  public readonly id!: Snowflake;
+  public declare readonly id: Snowflake;
+  /**
+   * Created timestamp of this role.
+   */
+  public declare readonly createdTimestamp: number;
   protected declare _name: string;
   protected declare _color: number;
   protected declare _hoist: boolean;
@@ -30,10 +38,10 @@ export class Role extends Base {
   public constructor(guild: Guild, data: APIRole) {
     super(guild.client);
 
-    Object.defineProperties(this, {
-      id: { value: data.id },
-      _guild: { value: guild }
-    });
+    // Define readonly properties
+    defineReadonlyProperty(this, 'guild', guild);
+    defineReadonlyProperty(this, 'id', data.id);
+    defineReadonlyProperty(this, 'createdTimestamp', DiscordSnowflake.getTimestampFromId(this.id));
 
     this.patch(data);
   }
@@ -93,13 +101,6 @@ export class Role extends Base {
    */
   public toString(): string {
     throw new Error('Method not implemented.');
-  }
-
-  /**
-   * Guild this role is in.
-   */
-  public get guild() {
-    return this._guild;
   }
 
   /**
