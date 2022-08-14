@@ -1,11 +1,13 @@
 import type { Client } from '../Client/Client.ts';
 import type { Clonable, Patchable, ToJSON, ToString, Updatable } from '../Utils/Types.ts';
+import { defineReadonlyProperty } from '../Utils/Utils.ts';
 
 export abstract class Base implements ToJSON, ToString, Patchable, Clonable, Updatable {
-  #client: Client;
+  public declare readonly client: Client;
 
   public constructor(client: Client) {
-    this.#client = client;
+    // Define readonly properties
+    defineReadonlyProperty(this, 'client', client);
   }
 
   /**
@@ -30,8 +32,4 @@ export abstract class Base implements ToJSON, ToString, Patchable, Clonable, Upd
   public abstract toJSON(): Record<string, unknown>;
   public abstract toString(): string;
   public abstract patch(data: unknown): void;
-
-  public get client() {
-    return this.#client;
-  }
 }
