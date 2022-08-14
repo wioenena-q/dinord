@@ -1,24 +1,46 @@
 import {
   EventEmitter,
   GatewayDispatchEvents,
+  GatewayIdentifyData,
   GatewayOpcodes,
+  GatewayResumeData,
   type GatewayReadyDispatchData,
   type GatewayReceivePayload
 } from '../../deps.ts';
 import { URLManager } from '../../Managers/URLManager.ts';
-import { defineReadonlyProperty, isInstanceOf, toObject } from '../../Utils/Utils.ts';
+import { defineReadonlyProperty, isInstanceOf, isString, toObject } from '../../Utils/Utils.ts';
 // Compression and decompression library
 import { Inflate } from 'https://deno.land/x/compress@v0.4.5/zlib/mod.ts?code';
 
 import type { ToString } from '../../Utils/Types.ts';
+import { ClientEvents } from '../Client.ts';
 import type { WebSocketManager } from './WebSocketManager.ts';
+
+export interface Shard {
+  on<E extends keyof IShardEvents>(eventName: E, listener: (...args: IShardEvents[E]) => void): this;
+  on(eventName: string | symbol, listener: (...args: unknown[]) => void): this;
+  once<E extends keyof IShardEvents>(eventName: E, listener: (...args: IShardEvents[E]) => void): this;
+  once(eventName: string | symbol, listener: (...args: unknown[]) => void): this;
+  emit<E extends keyof IShardEvents>(eventName: E, ...args: IShardEvents[E]): boolean;
+  emit(eventName: string | symbol, ...args: unknown[]): boolean;
+  off<E extends keyof IShardEvents>(eventName: E, listener: (...args: IShardEvents[E]) => void): this;
+  off(eventName: string | symbol, listener: (...args: unknown[]) => void): this;
+  removeAllListeners<E extends keyof IShardEvents>(eventName?: E): this;
+  removeAllListeners(eventName?: string | symbol): this;
+  listeners<E extends keyof IShardEvents>(eventName: E): Array<(...args: IShardEvents[E]) => void>;
+  listeners(eventName: string | symbol): Array<(...args: unknown[]) => void>;
+  rawListeners<E extends keyof IShardEvents>(eventName: E): Array<(...args: IShardEvents[E]) => void>;
+  rawListeners(eventName: string | symbol): Array<(...args: unknown[]) => void>;
+  listenerCount<E extends keyof IShardEvents>(type: E): number;
+  listenerCount(type: string | symbol): number;
+}
 
 /**
  * @class
  * @extends {EventEmitter<IShardEvents>}
  * @implements {ToString}
  */
-export class Shard extends EventEmitter<IShardEvents> implements ToString {
+export class Shard extends EventEmitter implements ToString {
   /**
    * ID of this shard.
    */
@@ -29,7 +51,7 @@ export class Shard extends EventEmitter<IShardEvents> implements ToString {
   public declare readonly manager: WebSocketManager;
   #sessionId: string | null = null;
   // WebSocket connection for this shard
-  #ws?: WebSocket | null = null;
+  #ws: WebSocket | null = null;
   #state: ShardState = ShardState.Disconnected;
   // Heartbeat interval ID or null
   #heartbeatInterval: number | null = null;
@@ -68,12 +90,12 @@ export class Shard extends EventEmitter<IShardEvents> implements ToString {
    * @returns {Promise<void>}
    */
   public connect() {
-    // error if ws is not null or status is not Disconnected
-    if (this.#ws !== null || this.#state !== ShardState.Disconnected)
-      return Promise.reject(new Error('Already connected'));
+    // If connected, return.
+    if (this.#ws?.readyState === WebSocket.OPEN) return Promise.resolve();
 
     // Return new promise for shard queue
     return new Promise<void>((resolve, reject) => {
+      if (!isString(this.manager.client.options.token)) reject(new Error('Token is not a string'));
       // Call resolve when shard is ready
       this.once(ShardEvents.Ready, () => {
         resolve();
@@ -110,7 +132,9 @@ export class Shard extends EventEmitter<IShardEvents> implements ToString {
    * @returns {void}
    */
   #onClose(event: CloseEvent) {
-    this.emit(ShardEvents.Disconnect);
+    if (event.code === 1000)
+      // Self-disconnect
+      this.manager.client.emit(ClientEvents.ShardDisconnect, this.id);
   }
 
   /**
@@ -152,7 +176,7 @@ export class Shard extends EventEmitter<IShardEvents> implements ToString {
 
   /**
    *
-   * TODO: Full implement
+   *
    * Handle the incoming packet
    * @param data - Packet from Gateway
    */
@@ -167,10 +191,21 @@ export class Shard extends EventEmitter<IShardEvents> implements ToString {
       case GatewayOpcodes.Hello: {
         const { heartbeat_interval } = d;
         this.#sendHeartbeats(heartbeat_interval as number);
-        this.#identify();
+        this.#identifyNew();
         this.#debug(`Ready`);
         break;
       }
+      // Invalid session, reconnect
+      case GatewayOpcodes.InvalidSession:
+        this.#debug(`Invalid session trying to reconnect`);
+        this.disconnect();
+        this.connect();
+        this.#state = ShardState.Connected;
+        break;
+      // Resume session
+      case GatewayOpcodes.Reconnect:
+        this.#identifyResume();
+        break;
       // Events are triggered
       case GatewayOpcodes.Dispatch:
         this.#handleEvent(t!, d);
@@ -184,52 +219,77 @@ export class Shard extends EventEmitter<IShardEvents> implements ToString {
     }
   }
 
-  /**
-   *
-   * TODO: Implement
-   * Reconnect to the gateway
-   */
-  public reconnect() {
-    throw new Error('Method not implemented.');
+  #reset() {
+    if (this.#heartbeatInterval !== null) {
+      clearInterval(this.#heartbeatInterval);
+      this.#heartbeatInterval = null;
+    }
   }
 
   /**
    *
-   * TODO: Implement
    * Disconnect from gateway
    */
   public disconnect() {
-    throw new Error('Method not implemented.');
+    if (this.#ws === null || this.#ws.readyState !== WebSocket.OPEN) return;
+    this.#ws.close(1000);
+    this.#ws = null;
+    this.#reset();
   }
 
   /**
-   * Send OP 2 Identify data to Gateway
-   * @see {@link https://discord.com/developers/docs/topics/gateway#identifying}
-   * @returns {void}
+   *
+   * Send identify data to gateway
    */
-  #identify() {
-    if (this.#ws === null || this.#state !== ShardState.Connected) return;
-    if (this.#sessionId) {
-      // TODO: Reconnect to gateway
+  public identify() {
+    if (this.#state !== ShardState.Connected || this.#ws === null) return;
+    if (this.#sessionId !== null && this.#sequence !== null) {
+      this.#debug(`[RESUME] Shard ${this.id}/${this.manager.options.shardCount}`);
+      this.#identifyResume();
     } else {
-      // First connection to gateway
-      const d = {
-        token: this.manager.client.options.token,
-        properties: {
-          os: Deno.build.os,
-          browser: 'dinord',
-          device: 'dinord'
-        },
-        large_threshold: this.manager.options.largeThreshold,
-        shard: [this.id, this.manager.options.shardCount],
-        intents: this.manager.options.intents,
-        compress: this.manager.options.compress
-      };
-      this.#ws!.send(this.manager.pack({ op: GatewayOpcodes.Identify, d }));
       this.#debug(
         `[IDENTIFY] Shard ${this.id}/${this.manager.options.shardCount} with intents ${this.manager.options.intents}`
       );
+      this.#identifyNew();
     }
+  }
+
+  /**
+   * Send OP 2 new Identify data to Gateway
+   * @see {@link https://discord.com/developers/docs/topics/gateway#identifying}
+   * @returns {void}
+   */
+  #identifyNew() {
+    // First connection to gateway
+    const d: GatewayIdentifyData = {
+      token: this.manager.client.options.token!,
+      properties: {
+        os: Deno.build.os,
+        browser: 'dinord',
+        device: 'dinord'
+      },
+      large_threshold: this.manager.options.largeThreshold,
+      shard: [this.id, this.manager.options.shardCount as number],
+      intents: this.manager.options.intents,
+      compress: this.manager.options.compress
+    };
+
+    this.send({ op: GatewayOpcodes.Identify, d });
+  }
+
+  /**
+   *
+   * Send OP 6 Resume data to Gateway
+   */
+  #identifyResume() {
+    // Resume connection to gateway
+    const d: GatewayResumeData = {
+      token: this.manager.client.options.token!,
+      seq: this.#sequence!,
+      session_id: this.#sessionId!
+    };
+
+    this.send({ op: GatewayOpcodes.Resume, d });
   }
 
   /**
@@ -263,22 +323,35 @@ export class Shard extends EventEmitter<IShardEvents> implements ToString {
   #sendHeartbeats(ms: number): void {
     if (this.#heartbeatInterval === null && this.#state === ShardState.Connected && this.#ws !== null) {
       this.#heartbeatInterval = setInterval(() => {
-        this.#lastPingTimestamp = Date.now();
-        this.#debug(`Sent heartbeat to gateway.`);
-        this.#ws!.send(
-          this.manager.pack({
+        if (this.#ws !== null) {
+          this.#lastPingTimestamp = Date.now();
+          this.#debug(`Sent heartbeat to gateway.`);
+          this.send({
             op: GatewayOpcodes.Heartbeat,
             d: this.#sequence
-          })
-        );
+          });
+        }
       }, ms);
     }
   }
 
+  /**
+   * Handle heartbeat ACK
+   */
   #heartbeatACK() {
     const latency = Date.now() - (this.#lastPingTimestamp ?? 0);
     this.#ping = latency;
     this.#debug(`Received heartbeat ACK. Latency: ${latency}ms`);
+  }
+
+  /**
+   * Send data to the gateway
+   * @param data - Data to send to the gateway
+   */
+  public send(data: unknown) {
+    if (this.#ws === null || this.#ws.readyState !== WebSocket.OPEN)
+      throw new Error('Shard is not connected, message cannot be sent');
+    this.#ws.send(this.manager.pack(data));
   }
 
   #debug(message: string) {
