@@ -1,3 +1,5 @@
+import { Snowflake } from '../deps.ts';
+
 export class DiscordSnowflake extends null {
   public declare static readonly DISCORD_EPOCH: bigint;
 
@@ -6,7 +8,7 @@ export class DiscordSnowflake extends null {
    * Parse a Discord snowflake ID
    * @param id - Discord snowflake id
    */
-  public static parseId(id: string) {
+  public static parseId(id: Snowflake) {
     const _id = BigInt(id);
     return {
       timestamp: Number((_id >> 22n) + this.DISCORD_EPOCH),
