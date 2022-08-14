@@ -101,6 +101,7 @@ export class RESTClient {
     if (response.status === 200 || response.ok) return response;
     else {
       const error = await response.json();
+
       throw new DiscordAPIError({ message: error.message, method, status: response.status, url, ...error });
     }
   }
@@ -123,7 +124,8 @@ export class RESTClient {
    * @returns {Promise<unknown>}
    */
   public async post(url: string, options?: RequestInit) {
-    // TODO: Implement
+    const response = await this.#request(url, HTTPMethod.Post, options);
+    return response.json();
   }
 
   /**
@@ -142,9 +144,8 @@ export class RESTClient {
    * @param {RequestInit?} [options]
    * @returns {Promise<unknown>}
    */
-  public async delete(url: string, options?: RequestInit) {
-    const response = await this.#request(url, HTTPMethod.Delete, options);
-    return response.json();
+  public delete(url: string, options?: RequestInit) {
+    return this.#request(url, HTTPMethod.Delete, options);
   }
 
   /**
