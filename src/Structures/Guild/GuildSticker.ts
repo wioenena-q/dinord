@@ -1,12 +1,7 @@
+import { toObject } from '../../Utils/Utils.ts';
 import { Base } from '../Base.ts';
 
-import type {
-  APISticker,
-  Snowflake,
-  StickerFormatType,
-  StickerType
-} from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
-import { toObject } from '../../Utils/Utils.ts';
+import type { APISticker, Snowflake, StickerFormatType, StickerType } from '../../deps.ts';
 import type { Guild } from './Guild.ts';
 
 export class GuildSticker extends Base {
