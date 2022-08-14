@@ -1,5 +1,6 @@
-import { assertEquals, assertObjectMatch } from 'https://deno.land/std/testing/asserts.ts';
+import { assertEquals, assertObjectMatch, assertThrows } from 'https://deno.land/std/testing/asserts.ts';
 import {
+  defineReadonlyProperty,
   isArray,
   isBigInt,
   isBoolean,
@@ -177,4 +178,17 @@ Deno.test('toObject', () => {
       a: 20
     }
   });
+});
+
+Deno.test('defineReadonlyProperty', () => {
+  const o: { test?: number } = {};
+  defineReadonlyProperty(o, 'test', 1);
+  assertEquals(o.test, 1);
+  assertThrows(
+    () => {
+      o.test = 2;
+    },
+    TypeError,
+    "Cannot assign to read only property 'test' of object '#<Object>'"
+  );
 });
