@@ -1,12 +1,24 @@
-import { toObject } from '../../Utils/Utils.ts';
+import { defineReadonlyProperty, toObject } from '../../Utils/Utils.ts';
 import { Emoji } from '../Emoji.ts';
 
 import type { APIEmoji, Snowflake } from '../../deps.ts';
+import { DiscordSnowflake } from '../DiscordSnowflake.ts';
 import type { Guild } from './Guild.ts';
 
 export class GuildEmoji extends Emoji {
-  private declare _guild: Guild;
-  public readonly id!: Snowflake | null;
+  /**
+   * Guild this emoji is in.
+   */
+  public declare readonly guild: Guild;
+  /**
+   * ID of this emoji.
+   */
+  public declare readonly id: Snowflake;
+  /**
+   * Created timestamp of this emoji.
+   */
+  public declare readonly createdTimestamp: number;
+
   protected declare _author: unknown | null; // TODO: Convert unknown to User
   protected declare _roles: Snowflake[];
   protected declare _requireColons: boolean;
@@ -17,10 +29,10 @@ export class GuildEmoji extends Emoji {
   public constructor(guild: Guild, data: APIEmoji) {
     super(guild.client, data);
 
-    Object.defineProperties(this, {
-      id: { value: data.id },
-      _guild: { value: guild }
-    });
+    // Define readonly properties
+    defineReadonlyProperty(this, 'guild', guild);
+    defineReadonlyProperty(this, 'id', data.id!);
+    defineReadonlyProperty(this, 'createdTimestamp', DiscordSnowflake.getTimestampFromId(this.id));
 
     this.patch(data);
   }
@@ -43,17 +55,10 @@ export class GuildEmoji extends Emoji {
   }
 
   /**
-   * Guild this emoji is in.
-   */
-  public get guild() {
-    return this._guild;
-  }
-
-  /**
    * Roles allowed to use this emoji or null
    */
   public get roles() {
-    return this._guild.roles.filter((r) => this._roles!.includes(r.id));
+    return this.guild.roles.filter((r) => this._roles!.includes(r.id));
   }
 
   /**
