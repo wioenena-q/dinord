@@ -1,5 +1,5 @@
 import { DiscordAPIError } from '../Errors/DiscordAPIError.ts';
-import { isObject, toObject, wait } from '../Utils/Utils.ts';
+import { defineReadonlyProperty, delay, isObject, toObject } from '../Utils/Utils.ts';
 import type { Client } from './Client.ts';
 
 /**
@@ -7,15 +7,16 @@ import type { Client } from './Client.ts';
  * @classdesc RESTClient is a class that manages the requests that are sent to the server.
  */
 export class RESTClient {
-  #client: Client;
-  #buckets = new Map<string, { remaining: number; requestCount: number; resetAfter: number }>();
+  public declare readonly client: Client;
+  public declare readonly buckets: Map<string, { remaining: number; requestCount: number; resetAfter: number }>;
 
   /**
    *
    * @param client - Client instance for RESTClient
    */
   public constructor(client: Client) {
-    this.#client = client;
+    defineReadonlyProperty(this, 'client', client);
+    defineReadonlyProperty(this, 'buckets', new Map());
   }
 
   /**
@@ -36,7 +37,7 @@ export class RESTClient {
       headers: {
         'Content-Type': 'application/json',
         ...(options.headers ?? {}),
-        Authorization: `Bot ${this.#client.options.token}`
+        Authorization: `Bot ${this.client.options.token}`
       }
     };
 
@@ -51,11 +52,11 @@ export class RESTClient {
     // If the rate limit headers are present, update or create a bucket
     if (xBucket && xRemaining && xResetAfter) {
       // Get bucket from cache
-      const bucket = this.#buckets.get(xBucket);
+      const bucket = this.buckets.get(xBucket);
 
       // If not in cache, create a new bucket
       if (!bucket) {
-        this.#buckets.set(xBucket, {
+        this.buckets.set(xBucket, {
           remaining: parseInt(xRemaining),
           requestCount: 1,
           resetAfter: +xResetAfter * 1000
@@ -68,9 +69,9 @@ export class RESTClient {
         if (bucket.remaining === 0) {
           this.#debug(`Bucket ${xBucket} is full, waiting ${bucket.resetAfter}ms`);
           // Wait reset after time
-          await wait(bucket.resetAfter);
+          await delay(bucket.resetAfter);
           // Delete bucket from cache
-          this.#buckets.delete(xBucket);
+          this.buckets.delete(xBucket);
           // Resend request
           return this.#request(url, method, options);
         }
@@ -86,7 +87,7 @@ export class RESTClient {
 
       if (retryAfter) {
         this.#debug(`Rate limit exceeded, waiting ${+retryAfter * 1000}ms`);
-        await wait(+retryAfter * 1000);
+        await delay(+retryAfter * 1000);
         return this.#request(url, method, options);
       } else
         throw new DiscordAPIError({
@@ -153,21 +154,16 @@ export class RESTClient {
    * @returns {Promise<unknown>}
    */
   public async patch(url: string, options: RequestInit = {}) {
-    if (options.body) options.body = JSON.stringify(options.body);
     const response = await this.#request(url, HTTPMethod.Patch, options);
     return response.json();
   }
 
   #debug(message: string) {
-    this.#client.debug(`[Dinord => RESTClient]: ${message}`);
+    this.client.debug(`[Dinord => RESTClient]: ${message}`);
   }
 
   public [Symbol.for('Deno.customInspect')](inspect: typeof Deno.inspect, options: Deno.InspectOptions) {
-    return inspect(toObject(this, ['client']), options);
-  }
-
-  public get client() {
-    return this.#client;
+    return inspect(toObject(this, ['client', ...Object.keys(this)]), options);
   }
 }
 
