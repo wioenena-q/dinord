@@ -21,7 +21,7 @@ export class URLManager extends null {
    * @param {string[]} args - Array of arguments to join
    * @returns {string}
    */
-  private static join(...args: string[]) {
+  public static join(...args: string[]) {
     return args.join('/');
   }
 
@@ -51,12 +51,16 @@ export class URLManager extends null {
     return base;
   }
 
-  public static guildRoles(guildId: Snowflake) {
-    return this.join(this.APIBase(), 'guilds', guildId, 'roles');
-  }
-
   public static guild(guildId: Snowflake) {
     return this.join(this.APIBase(), 'guilds', guildId);
+  }
+
+  public static guildRole(guildId: Snowflake, roleId: Snowflake) {
+    return this.join(this.guild(guildId), 'roles', roleId);
+  }
+
+  public static guildRoles(guildId: Snowflake) {
+    return this.join(this.guild(guildId), 'roles');
   }
 }
 
