@@ -45,10 +45,10 @@ export const delay = (ms: number) =>
  * @param value - Value
  * @param attrs - Attributes, if any
  */
-export const defineReadonlyProperty = <T>(
+export const defineReadonlyProperty = <T, P extends keyof T>(
   target: T,
-  prop: keyof T,
-  value: unknown,
+  prop: P,
+  value: T[P],
   attrs: PropertyDescriptor = { enumerable: true }
 ) => {
   Object.defineProperty(target, prop, {
