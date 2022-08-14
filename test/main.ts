@@ -11,7 +11,12 @@ const client = new Client({
   }
 });
 
-client.on('ready', () => {});
+client.on('ready', () => {
+  const g = client.guilds.get('1000004567452352552');
+  if (g) {
+    g.setName('test');
+  }
+});
 
 client.on('guildCreate', (guild) => {
   console.log(`Client joined guild: ${guild.name}`);
