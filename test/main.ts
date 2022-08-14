@@ -11,9 +11,7 @@ const client = new Client({
   }
 });
 
-client.on('ready', () => {
-  console.log('ready');
-});
+client.on('ready', () => {});
 
 client.on('guildCreate', (guild) => {
   console.log(`Client joined guild: ${guild.name}`);
