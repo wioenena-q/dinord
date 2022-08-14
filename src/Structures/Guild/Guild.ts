@@ -214,199 +214,218 @@ export class Guild extends Base {
    *
    * Set name of this guild.
    * @param name - The name of the guild.
+   * @param [reason] - Reason for changing the guild name.
    */
-  public setName(name: string) {
+  public setName(name: string, reason?: string) {
     if (!isString(name) || name === '') throw new TypeError('Name must be a non-empty string.');
     if (name.length < 2 || name.length > 100)
       throw new RangeError('Name must be between or equal 2 and 100 characters.');
-    return this.edit({ name });
+    return this.edit({ name }, reason);
   }
 
   /**
    *
    * Set verification level of this guild.
    * @param level - The verification level of the guild.
+   * @param [reason] - Reason for changing the verification level.
    */
-  public setVerificationLevel(level: GuildVerificationLevel) {
+  public setVerificationLevel(level: GuildVerificationLevel, reason?: string) {
     if (level < 0 || level > 4) throw new RangeError('Verification level must be between or equals 0 and 4.');
-    return this.edit({ verificationLevel: level });
+    return this.edit({ verificationLevel: level }, reason);
   }
 
   /**
    *
    * Set default message notifications of this guild.
    * @param notifications - The default message notifications of the guild.
+   * @param [reason] - Reason for changing the default message notifications.
    */
-  public setDefaultMessageNotifications(notifications: GuildDefaultMessageNotifications) {
+  public setDefaultMessageNotifications(notifications: GuildDefaultMessageNotifications, reason?: string) {
     if (notifications < 0 || notifications > 1)
       throw new RangeError('Default message notifications must be equals 0 or 1.');
-    return this.edit({ defaultMessageNotifications: notifications });
+    return this.edit({ defaultMessageNotifications: notifications }, reason);
   }
 
   /**
    *
    * Set explicit content filter of this guild.
    * @param filter - The explicit content filter of the guild.
+   * @param [reason] - Reason for changing the explicit content filter.
    */
-  public setExplicitContentFilter(filter: GuildExplicitContentFilter) {
+  public setExplicitContentFilter(filter: GuildExplicitContentFilter, reason?: string) {
     if (filter < 0 || filter > 2)
       throw new RangeError('Explicit content filter must be between or equals 0 and 2.');
-    return this.edit({ explicitContentFilter: filter });
+    return this.edit({ explicitContentFilter: filter }, reason);
   }
 
   /**
    *
    * Set afk channel of this guild.
    * @param channel - The channel to set as the afk channel. TODO: Accept channel id or channel object
+   * @param [reason] - Reason for changing the afk channel.
    */
-  public setAFKChannel(channel: Snowflake | null) {
+  public setAFKChannel(channel: Snowflake | null, reason?: string) {
     // TODO: Check channel is voice channel
-    return this.edit({ afkChannelId: channel });
+    return this.edit({ afkChannelId: channel }, reason);
   }
 
   /**
    *
    * Set afk timeout of this guild.
    * @param timeout - The timeout in seconds to set as the afk timeout.
+   * @param [reason] - Reason for changing the afk timeout.
    */
-  public setAFKTimeout(timeout: number) {
+  public setAFKTimeout(timeout: number, reason?: string) {
     if (timeout < 60 || timeout > 3600) throw new RangeError('AFK timeout must be between or equal 60 and 3600.');
-    return this.edit({ afkTimeout: timeout });
+    return this.edit({ afkTimeout: timeout }, reason);
   }
 
   /**
    *
    * Set icon of this guild.
    * @param icon - The icon to set as the guild icon.
+   * @param [reason] - Reason for changing the guild icon.
    */
-  public setIcon(icon: unknown | null) {
-    return this.edit({ icon });
+  public setIcon(icon: unknown | null, reason?: string) {
+    return this.edit({ icon }, reason);
   }
 
   /**
    *
    * Set owner of this guild, if the bot owns the server
    * @param owner - The owner of the guild. TODO: Accept user id, user object or member object
+   * @param [reason] - Reason for changing the guild owner.
    */
-  public setOwner(owner: Snowflake) {
+  public setOwner(owner: Snowflake, reason?: string) {
     // TODO: Check if bot owns the server
-    return this.edit({ ownerId: owner });
+    return this.edit({ ownerId: owner }, reason);
   }
 
   /**
    *
    * Set splash of this guild.
    * @param splash - The splash to set as the guild splash.
+   * @param [reason] - Reason for changing the guild splash.
    */
-  public setSplash(splash: unknown | null) {
-    return this.edit({ splash });
+  public setSplash(splash: unknown | null, reason?: string) {
+    return this.edit({ splash }, reason);
   }
 
   /**
    *
    * Set discovery splash of this guild.
    * @param splash - The discovery splash to set as the guild splash.
+   * @param [reason] - Reason for changing the discovery splash.
    */
-  public setDiscoverSplash(splash: unknown | null) {
-    return this.edit({ discoverySplash: splash });
+  public setDiscoverSplash(splash: unknown | null, reason?: string) {
+    return this.edit({ discoverySplash: splash }, reason);
   }
 
   /**
    *
    * Set banner of this guild.
    * @param banner - The banner to set as the guild banner.
+   * @param [reason] - Reason for changing the banner.
    */
-  public setBanner(banner: unknown | null) {
-    return this.edit({ banner });
+  public setBanner(banner: unknown | null, reason?: string) {
+    return this.edit({ banner }, reason);
   }
 
   /**
    *
    * Set system channel of this guild.
    * @param channel - The channel to set as the system channel. TODO: Accept channel id or channel object
+   * @param [reason] - Reason for changing the system channel.
    */
-  public setSystemChannel(channel: Snowflake | null) {
+  public setSystemChannel(channel: Snowflake | null, reason?: string) {
     // TODO: Check channel is a text channel
-    return this.edit({ systemChannelId: channel });
+    return this.edit({ systemChannelId: channel }, reason);
   }
 
   /**
    *
    * Set system channel flags of this guild.
    * @param flags - The flags to set as the sytem channel flags.
+   * @param [reason] - Reason for changing the system channel flags.
    */
-  public setSystemChannelFlags(flags: GuildSystemChannelFlags) {
+  public setSystemChannelFlags(flags: GuildSystemChannelFlags, reason?: string) {
     if (!(flags === 1 || flags === 2 || flags === 4 || flags === 8))
       throw new RangeError('System channel flags must be equal 1, 2, 4 or 8.');
-    return this.edit({ systemChannelFlags: flags });
+    return this.edit({ systemChannelFlags: flags }, reason);
   }
 
   /**
    *
    * Set rules channel of this guild.
    * @param channel - The channel to set as the rules channel. TODO: Accept channel id or channel object
+   * @param [reason] - Reason for changing the rules channel.
    */
-  public setRulesChannel(channel: Snowflake) {
+  public setRulesChannel(channel: Snowflake, reason?: string) {
     // TODO: Check channel is a text channel
-    return this.edit({ rulesChannelId: channel });
+    return this.edit({ rulesChannelId: channel }, reason);
   }
 
   /**
    *
    * Set public updates channel of this guild.
    * @param channel - The channel to set as the public updates channel. TODO: Accept channel id or channel object
+   * @param [reason] - Reason for changing the public updates channel.
    */
-  public setPublicUpdatesChannel(channel: Snowflake) {
+  public setPublicUpdatesChannel(channel: Snowflake, reason?: string) {
     // TODO: Check channel is a text channel
-    return this.edit({ publicUpdatesChannelId: channel });
+    return this.edit({ publicUpdatesChannelId: channel }, reason);
   }
 
   /**
    *
    * Set preferred locale of this guild.
    * @param locale - The locale to set as the guild locale.
+   * @param [reason] - Reason for changing the preferred locale.
    */
-  public setPreferredLocale(locale: string) {
-    return this.edit({ preferredLocale: locale });
+  public setPreferredLocale(locale: string, reason?: string) {
+    return this.edit({ preferredLocale: locale }, reason);
   }
 
   /**
    *
    * Set features of this guild.
    * @param features - The features to set as the guild features.
+   * @param [reason] - Reason for changing the guild features.
    */
-  public setFeatures(features: GuildFeature[]) {
-    return this.edit({ features });
+  public setFeatures(features: GuildFeature[], reason?: string) {
+    return this.edit({ features }, reason);
   }
 
   /**
    *
    * Set description of this guild.
    * @param description - The description of the guild.
+   * @param [reason] - Reason for changing the description.
    */
-  public setDescription(description: string) {
+  public setDescription(description: string, reason?: string) {
     if (!isString(description) || description.length > 120)
       throw new TypeError('Description must be a string of less than 120 characters.');
 
-    return this.edit({ description });
+    return this.edit({ description }, reason);
   }
 
   /**
    * Enable or disable the premium progress bar for this guild
    * @param enabled - Whether the guild's boost progress bar should be enabled
-   * @returns
+   * @param [reason] - Reason for changing setting the premium progress bar
    */
-  public setPremiumProgressBarEnabled(enabled: boolean) {
+  public setPremiumProgressBarEnabled(enabled: boolean, reason?: string) {
     if (!isBoolean(enabled)) throw new TypeError('Enabled must be a boolean.');
-    return this.edit({ premiumProgressBarEnabled: enabled });
+    return this.edit({ premiumProgressBarEnabled: enabled }, reason);
   }
 
   /**
    *
    * Edit this guild.
    * @param data - The data to edit the guild with.
+   * @param reason - The reason to edit the guild with.
    */
-  public async edit(data: GuildEditData) {
+  public async edit(data: GuildEditData, reason?: string) {
     const _data: Record<PropertyKey, unknown> = {};
 
     if ('name' in data) _data.name = data.name;
@@ -431,7 +450,12 @@ export class Guild extends Base {
     if ('premiumProgressBarEnabled' in data) _data.premium_progress_bar_enabled = data.premiumProgressBarEnabled;
 
     await this.client.rest.patch(URLManager.guild(this.id), {
-      body: JSON.stringify(_data)
+      body: JSON.stringify(_data),
+      headers: reason
+        ? {
+            'X-Audit-Log-Reason': reason
+          }
+        : {}
     });
 
     return this;
@@ -774,6 +798,28 @@ export class Guild extends Base {
   }
 }
 
+/**
+ * @typedef {Object} GuildEditData
+ * @property {string?} [name] - Name of the guild.
+ * @property {GuildVerificationLevel} [verificationLevel] - Verification level of the guild.
+ * @property {GuildNotificationLevel} [defaultMessageNotifications] - Default message notifications level of the guild.
+ * @property {GuildExplicitContentFilter} [explicitContentFilter] - Explicit content filter level of the guild.
+ * @property {(Snowflake|null)?} [afkChannelId] - ID of the AFK channel. If null, the guild won't have an AFK channel.
+ * @property {number?} [afkTimeout] - AFK timeout in seconds.
+ * @property {(unknown|null)?} [icon] - Image data for the guild icon. If null, the guild won't have an icon.
+ * @property {Snowflake?} [ownerId] - ID of the guild owner.
+ * @property {(unknown|null)?} [splash] - Image data for the guild splash. If null, the guild won't have a splash.
+ * @property {(unknown|null)?} [discoverySplash] - Image data for the guild discovery splash.
+ * @property {(unknown|null)?} [banner] - Image data for the guild banner. If null, the guild won't have a banner.
+ * @property {(Snowflake|null)?} [systemChannelId] - ID of the system channel. If null, the guild won't have a system channel.
+ * @property {GuildSystemChannelFlags?} [systemChannelFlags] - System channel flags of the guild.
+ * @property {Snowflake?} [rulesChannelId] - ID of the rules channel.
+ * @property {string?} [preferredLocale] - Preferred locale of the guild.
+ * @property {GuildFeature[]?} [features] - Enabled guild features.
+ * @property {(string|null)?} [description] - Description of the guild. If null, the guild won't have a description.
+ * @property {boolean?} [premiumProgressBarEnabled] - Enable or disable the premium progress bar for this guild.
+ *
+ */
 export interface GuildEditData {
   name?: string;
   verificationLevel?: GuildVerificationLevel | null;
