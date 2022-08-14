@@ -1,18 +1,36 @@
-import { Collection, EventEmitter } from '../deps.ts';
+import { Collection, EventEmitter, type Snowflake } from '../deps.ts';
 import { URLManager } from '../Managers/URLManager.ts';
 import { defineReadonlyProperty, isObject, isString, toObject } from '../Utils/Utils.ts';
 import { RESTClient } from './RESTClient.ts';
 import { WebSocketManager, type WebSocketManagerOptions } from './ws/WebSocketManager.ts';
 
-import type { Snowflake } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 import type { Guild } from '../Structures/Guild/Guild.ts';
 import type { Shard } from './ws/Shard.ts';
+
+export interface Client {
+  on<E extends keyof IClientEvents>(eventName: E, listener: (...args: IClientEvents[E]) => void): this;
+  on(eventName: string | symbol, listener: (...args: unknown[]) => void): this;
+  once<E extends keyof IClientEvents>(eventName: E, listener: (...args: IClientEvents[E]) => void): this;
+  once(eventName: string | symbol, listener: (...args: unknown[]) => void): this;
+  emit<E extends keyof IClientEvents>(eventName: E, ...args: IClientEvents[E]): boolean;
+  emit(eventName: string | symbol, ...args: unknown[]): boolean;
+  off<E extends keyof IClientEvents>(eventName: E, listener: (...args: IClientEvents[E]) => void): this;
+  off(eventName: string | symbol, listener: (...args: unknown[]) => void): this;
+  removeAllListeners<E extends keyof IClientEvents>(eventName?: E): this;
+  removeAllListeners(eventName?: string | symbol): this;
+  listeners<E extends keyof IClientEvents>(eventName: E): Array<(...args: IClientEvents[E]) => void>;
+  listeners(eventName: string | symbol): Array<(...args: unknown[]) => void>;
+  rawListeners<E extends keyof IClientEvents>(eventName: E): Array<(...args: IClientEvents[E]) => void>;
+  rawListeners(eventName: string | symbol): Array<(...args: unknown[]) => void>;
+  listenerCount<E extends keyof IClientEvents>(type: E): number;
+  listenerCount(type: string | symbol): number;
+}
 
 /**
  * @class
  * @classdesc Client class for the Discord API
  */
-export class Client extends EventEmitter<IClientEvents> {
+export class Client extends EventEmitter {
   /**
    * WebSocket manager for connection, reconnection, disconnection, shards, etc.
    */
@@ -84,7 +102,17 @@ export class Client extends EventEmitter<IClientEvents> {
    * Disconnect to gateway
    */
   public destroy() {
-    this.ws.close();
+    this.guilds.clear();
+    this.users.clear();
+    this.rest.buckets.clear();
+    return this.ws.disconnect();
+  }
+
+  /**
+   * Reconnect to gateway
+   */
+  public reconnect() {
+    return this.ws.reconnect();
   }
 
   /**
@@ -142,5 +170,6 @@ export const enum ClientEvents {
   GuildDelete = 'guildDelete',
   GuildUpdate = 'guildUpdate',
   ShardReady = 'shardReady',
+  ShardDisconnect = 'shardDisconnect',
   Debug = 'debug'
 }
