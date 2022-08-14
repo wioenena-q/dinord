@@ -181,7 +181,7 @@ export class Color extends null {
       } else throw new Error('Unknown color: ' + color);
     } else if (isObject<RGBColor>(color) && isKeyOf(color, 'r') && isKeyOf(color, 'g') && isKeyOf(color, 'b')) {
       // If color is rgb object, return rgb color
-      if (!validRGB(color)) throw new Error('Invalid rgb color: ' + color);
+      if (!isValidRGB(color)) throw new Error('Invalid rgb color: ' + color);
       const { r, g, b } = color;
       return (r << 16) + (g << 8) + b;
     } else throw new TypeError(`${color} is not a valid color.`);
@@ -231,7 +231,7 @@ export type HexColor = `#${string}`;
 export type RGBColor = { r: number; g: number; b: number };
 export type DefaultColors = keyof typeof Color.DefaultColors;
 
-const validRGB = (rgb: RGBColor) => {
+const isValidRGB = (rgb: RGBColor) => {
   const { r, g, b } = rgb;
   return (
     isNumber(r) && isNumber(g) && isNumber(b) && r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255
