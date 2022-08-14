@@ -1,7 +1,7 @@
 import { Base } from './Base.ts';
 
-import type { APIEmoji } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 import type { Client } from '../Client/Client.ts';
+import type { APIEmoji } from '../deps.ts';
 
 export class Emoji extends Base {
   protected declare _name: string | null;
