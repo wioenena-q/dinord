@@ -1,18 +1,4 @@
 import {
-  GuildDefaultMessageNotifications,
-  GuildExplicitContentFilter,
-  GuildFeature,
-  GuildMFALevel,
-  GuildNSFWLevel,
-  GuildPremiumTier,
-  GuildSystemChannelFlags,
-  GuildVerificationLevel,
-  type APIGuild,
-  type APIUnavailableGuild,
-  type GatewayGuildCreateDispatchData,
-  type Snowflake
-} from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
-import {
   GuildChannelManager,
   GuildEmojiManager,
   GuildMemberManager,
@@ -26,6 +12,20 @@ import { toObject } from '../../Utils/Utils.ts';
 import { Base } from '../Base.ts';
 
 import type { Client } from '../../Client/Client.ts';
+import {
+  type APIGuild,
+  type APIUnavailableGuild,
+  type GatewayGuildCreateDispatchData,
+  type GuildDefaultMessageNotifications,
+  type GuildExplicitContentFilter,
+  type GuildFeature,
+  type GuildMFALevel,
+  type GuildNSFWLevel,
+  type GuildPremiumTier,
+  type GuildSystemChannelFlags,
+  type GuildVerificationLevel,
+  type Snowflake
+} from '../../deps.ts';
 
 /**
  *
