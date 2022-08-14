@@ -168,7 +168,8 @@ export class Color extends null {
   public static resolve(color: RGBColor): number;
   public static resolve(color: ColorResolvable): number;
   public static resolve(color: unknown): number {
-    if (isString(color)) {
+    if (isNumber(color)) return color;
+    else if (isString(color)) {
       // If hex string, return hex color
       if (hexRegex.test(color)) {
         color = color.slice(1);
@@ -226,7 +227,7 @@ export class Color extends null {
 
 const hexRegex = /^#(?:[0-9a-f]{3}){1,2}$/i;
 
-export type ColorResolvable = HexColor | RGBColor | DefaultColors;
+export type ColorResolvable = HexColor | RGBColor | DefaultColors | number;
 export type HexColor = `#${string}`;
 export type RGBColor = { r: number; g: number; b: number };
 export type DefaultColors = keyof typeof Color.DefaultColors;
