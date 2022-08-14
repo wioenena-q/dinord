@@ -49,7 +49,7 @@ export const defineReadonlyProperty = <T, P extends keyof T>(
   target: T,
   prop: P,
   value: T[P],
-  attrs: PropertyDescriptor = { enumerable: true }
+  attrs: PropertyDescriptor = {}
 ) => {
   Object.defineProperty(target, prop, {
     ...attrs,
