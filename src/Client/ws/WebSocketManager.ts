@@ -172,12 +172,37 @@ export class WebSocketManager implements ToString {
       : JSON.parse(data as string);
   }
 
+  #reset() {
+    this.#state = WebSocketManagerState.Disconnected;
+    this.#concurrencyCount = 0;
+    this.#totalGuildCount = 0;
+  }
+
   /**
+   *
    * Disconnect from the gateway
-   * TODO: Implement
    */
-  public close() {
-    throw new Error('Not implemented');
+  public disconnect() {
+    if (this.#state === WebSocketManagerState.Disconnected) return Promise.resolve();
+    this.#reset();
+    this.shards.forEach((shard) => {
+      shard.disconnect();
+      this.shards.delete(shard.id);
+    });
+    this.#state = WebSocketManagerState.Disconnected;
+    this.#debug(`Disconnected from gateway.`);
+  }
+
+  /**
+   * Reconnect to the gateway
+   */
+  public async reconnect() {
+    if (this.#state === WebSocketManagerState.Reconnecting) return;
+    this.#state = WebSocketManagerState.Reconnecting;
+    this.#debug(`Reconnecting to gateway...`);
+    await this.connect();
+    this.#state = WebSocketManagerState.Connected;
+    this.#debug(`Reconnected to gateway.`);
   }
 
   public toString() {
