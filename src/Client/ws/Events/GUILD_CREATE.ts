@@ -2,7 +2,7 @@ import { Guild } from '../../../Structures/Guild/Guild.ts';
 import { ClientEvents } from '../../Client.ts';
 import { Base } from './Base.ts';
 
-import type { GatewayGuildCreateDispatchData } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
+import type { GatewayGuildCreateDispatchData } from '../../../deps.ts';
 
 /**
  * @class

@@ -1,5 +1,4 @@
-import { GatewayDispatchEvents } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
-import { Collection } from '../../../deps.ts';
+import { Collection, GatewayDispatchEvents } from '../../../deps.ts';
 import { WebSocketManager } from '../WebSocketManager.ts';
 import type { Base } from './Base.ts';
 import { GuildCreateEvent } from './GUILD_CREATE.ts';

@@ -1,6 +1,6 @@
 import { Base } from './Base.ts';
 
-import type { GatewayReadyDispatchData } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
+import type { GatewayReadyDispatchData } from '../../../deps.ts';
 
 /**
  * @class
