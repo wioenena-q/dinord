@@ -1,4 +1,4 @@
-import { assertEquals, assertObjectMatch, assertThrows } from 'https://deno.land/std/testing/asserts.ts';
+import { assert, assertEquals, assertObjectMatch, assertThrows } from 'https://deno.land/std/testing/asserts.ts';
 import {
   defineReadonlyProperty,
   isArray,
@@ -6,6 +6,7 @@ import {
   isBoolean,
   isFunction,
   isInstanceOf,
+  isKeyOf,
   isNumber,
   isObject,
   isString,
@@ -191,4 +192,14 @@ Deno.test('defineReadonlyProperty', () => {
     TypeError,
     "Cannot assign to read only property 'test' of object '#<Object>'"
   );
+});
+
+Deno.test('isKeyOf', () => {
+  const o = {
+    a: 1,
+    b: 2,
+    c: 3
+  };
+  assert(isKeyOf(o, 'a'));
+  assert(!isKeyOf(o, 'd'));
 });
