@@ -1,6 +1,14 @@
 import { Collection } from '../../deps.ts';
 import { URLManager } from '../../Managers/URLManager.ts';
-import { isInstanceOf, isNumber, isObject, isString, toObject, wait } from '../../Utils/Utils.ts';
+import {
+  defineReadonlyProperty,
+  delay,
+  isInstanceOf,
+  isNumber,
+  isObject,
+  isString,
+  toObject
+} from '../../Utils/Utils.ts';
 // Packing and unpacking library for ETF encoding
 import { pack as ETFPack, unpack as ETFUnpack } from 'https://deno.land/x/void@1.0.4/mod.ts';
 
@@ -19,16 +27,28 @@ import { Shard, ShardState } from './Shard.ts';
  * @implements {ToString}
  */
 export class WebSocketManager implements ToString {
-  #client: Client;
+  /**
+   * Client instance for WebSocketManager
+   */
+  public declare readonly client: Client;
   // Maximum concurrency. null if new instance created
   #maxConcurrency: number | null = null;
-  #shards = new Collection<number, Shard>();
+  /**
+   * Shard collection
+   */
+  public declare readonly shards: Collection<number, Shard>;
   #state: WebSocketManagerState;
   #options: Required<WebSocketManagerOptions>;
   // Increased concurrency count on each shard connection
   #concurrencyCount = 0;
-  #decoder = new TextDecoder();
-  #events = new EventManager(this);
+  /**
+   * For compressed JSON encoding
+   */
+  public declare readonly decoder: TextDecoder;
+  /**
+   *Manager class for gateway dispatch events
+   */
+  public declare readonly events: EventManager;
   // Total guild count
   #totalGuildCount = 0;
 
@@ -54,7 +74,12 @@ export class WebSocketManager implements ToString {
 
     if (!isNumber(options.intents)) throw new TypeError('WebSocketManager intents must be a number');
 
-    this.#client = client;
+    // Define readonly properties
+    defineReadonlyProperty(this, 'client', client);
+    defineReadonlyProperty(this, 'shards', new Collection());
+    defineReadonlyProperty(this, 'decoder', new TextDecoder());
+    defineReadonlyProperty(this, 'events', new EventManager(this));
+
     this.#state = WebSocketManagerState.Disconnected;
     this.#options = Object.assign(
       { largeThreshold: 50, compress: false, encoding: 'json', shardCount: 'auto' },
@@ -62,7 +87,7 @@ export class WebSocketManager implements ToString {
     ) as Required<WebSocketManagerOptions>;
 
     // Register all events.
-    this.#events.registerAll();
+    this.events.registerAll();
   }
 
   /**
@@ -76,7 +101,7 @@ export class WebSocketManager implements ToString {
     // Set state to connecting
     this.#state = WebSocketManagerState.Connecting;
     // Get concurrency limit and recommended shard amount
-    const { shards, session_start_limit } = await this.#client.rest.get<RESTGetAPIGatewayBotResult>(
+    const { shards, session_start_limit } = await this.client.rest.get<RESTGetAPIGatewayBotResult>(
       URLManager.gatewayBot()
     );
     this.#maxConcurrency = session_start_limit.max_concurrency;
@@ -99,7 +124,7 @@ export class WebSocketManager implements ToString {
       // Create a new shard
       const shard = new Shard(this, i);
       // Add the shard to the collection
-      this.#shards.set(shard.id, shard);
+      this.shards.set(shard.id, shard);
     }
   }
 
@@ -107,10 +132,10 @@ export class WebSocketManager implements ToString {
    * Try to connect the shards
    */
   async #tryConnectShards() {
-    for await (const [_, shard] of this.#shards) {
+    for await (const [_, shard] of this.shards) {
       if (this.#concurrencyCount >= this.#maxConcurrency!) {
         // Wait for 5 seconds
-        await wait(5000);
+        await delay(5000);
         // Reset the concurrency count
         this.#concurrencyCount = 0;
       }
@@ -120,7 +145,7 @@ export class WebSocketManager implements ToString {
         // It waits until the READY event is triggered on the shard.
         await shard.connect();
         // Trigger client event.
-        this.#client.emit(ClientEvents.ShardReady, shard);
+        this.client.emit(ClientEvents.ShardReady, shard);
         // Increase the concurrency count
         this.#concurrencyCount++;
       }
@@ -156,11 +181,11 @@ export class WebSocketManager implements ToString {
   }
 
   public toString() {
-    return `${this.constructor.name} (state ${this.#state}, shards: ${this.#shards.size})`;
+    return `${this.constructor.name} (state ${this.#state}, shards: ${this.shards.size})`;
   }
 
   #debug(message: string) {
-    this.#client.debug(`[Dinord => WebSocketManager]: ${message}`);
+    this.client.debug(`[Dinord => WebSocketManager]: ${message}`);
   }
 
   public [Symbol.for('Deno.customInspect')](inspect: typeof Deno.inspect, options: Deno.InspectOptions) {
@@ -168,17 +193,6 @@ export class WebSocketManager implements ToString {
       toObject(this, ['client', 'shards', 'state', 'options', 'decoder', 'events', 'totalGuildCount', 'ping']),
       options
     );
-  }
-
-  public get client() {
-    return this.#client;
-  }
-
-  /**
-   * Shard collection
-   */
-  public get shards() {
-    return this.#shards;
   }
 
   /**
@@ -190,21 +204,6 @@ export class WebSocketManager implements ToString {
 
   public get options() {
     return this.#options;
-  }
-
-  /**
-   * For compressed JSON encoding
-   */
-  public get decoder() {
-    return this.#decoder;
-  }
-
-  /**
-   *
-   * Manager class for gateway dispatch events
-   */
-  public get events() {
-    return this.#events;
   }
 
   /**
@@ -223,8 +222,8 @@ export class WebSocketManager implements ToString {
    * Ping of Client
    */
   public get ping() {
-    const pings = this.#shards.reduce((acc, s) => s.ping + acc, 0);
-    return pings > 0 ? pings / this.#shards.size : -1;
+    const pings = this.shards.reduce((acc, s) => s.ping + acc, 0);
+    return pings > 0 ? pings / this.shards.size : -1;
   }
 }
 
