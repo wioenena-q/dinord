@@ -51,8 +51,12 @@ export class URLManager extends null {
     return base;
   }
 
-  public static getGuildRoles(guildId: Snowflake) {
+  public static guildRoles(guildId: Snowflake) {
     return this.join(this.APIBase(), 'guilds', guildId, 'roles');
+  }
+
+  public static guild(guildId: Snowflake) {
+    return this.join(this.APIBase(), 'guilds', guildId);
   }
 }
 
