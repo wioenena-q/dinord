@@ -8,7 +8,7 @@ import {
   GuildStickerManager,
   GuildVoiceStateManager
 } from '../../Managers/Guild/mod.ts';
-import { defineReadonlyProperty, toObject } from '../../Utils/Utils.ts';
+import { defineReadonlyProperty, isBoolean, isString, toObject } from '../../Utils/Utils.ts';
 import { Base } from '../Base.ts';
 
 import type { Client } from '../../Client/Client.ts';
@@ -26,6 +26,7 @@ import type {
   GuildVerificationLevel,
   Snowflake
 } from '../../deps.ts';
+import { URLManager } from '../../Managers/URLManager.ts';
 import { DiscordSnowflake } from '../DiscordSnowflake.ts';
 
 /**
@@ -207,6 +208,233 @@ export class Guild extends Base {
     if ('scheduled_events' in data) {
       // TODO: Implement scheduled events
     }
+  }
+
+  /**
+   *
+   * Set name of this guild.
+   * @param name - The name of the guild.
+   */
+  public setName(name: string) {
+    if (!isString(name) || name === '') throw new TypeError('Name must be a non-empty string.');
+    if (name.length < 2 || name.length > 100)
+      throw new RangeError('Name must be between or equal 2 and 100 characters.');
+    return this.edit({ name });
+  }
+
+  /**
+   *
+   * Set verification level of this guild.
+   * @param level - The verification level of the guild.
+   */
+  public setVerificationLevel(level: GuildVerificationLevel) {
+    if (level < 0 || level > 4) throw new RangeError('Verification level must be between or equals 0 and 4.');
+    return this.edit({ verificationLevel: level });
+  }
+
+  /**
+   *
+   * Set default message notifications of this guild.
+   * @param notifications - The default message notifications of the guild.
+   */
+  public setDefaultMessageNotifications(notifications: GuildDefaultMessageNotifications) {
+    if (notifications < 0 || notifications > 1)
+      throw new RangeError('Default message notifications must be equals 0 or 1.');
+    return this.edit({ defaultMessageNotifications: notifications });
+  }
+
+  /**
+   *
+   * Set explicit content filter of this guild.
+   * @param filter - The explicit content filter of the guild.
+   */
+  public setExplicitContentFilter(filter: GuildExplicitContentFilter) {
+    if (filter < 0 || filter > 2)
+      throw new RangeError('Explicit content filter must be between or equals 0 and 2.');
+    return this.edit({ explicitContentFilter: filter });
+  }
+
+  /**
+   *
+   * Set afk channel of this guild.
+   * @param channel - The channel to set as the afk channel. TODO: Accept channel id or channel object
+   */
+  public setAFKChannel(channel: Snowflake | null) {
+    // TODO: Check channel is voice channel
+    return this.edit({ afkChannelId: channel });
+  }
+
+  /**
+   *
+   * Set afk timeout of this guild.
+   * @param timeout - The timeout in seconds to set as the afk timeout.
+   */
+  public setAFKTimeout(timeout: number) {
+    if (timeout < 60 || timeout > 3600) throw new RangeError('AFK timeout must be between or equal 60 and 3600.');
+    return this.edit({ afkTimeout: timeout });
+  }
+
+  /**
+   *
+   * Set icon of this guild.
+   * @param icon - The icon to set as the guild icon.
+   */
+  public setIcon(icon: unknown | null) {
+    return this.edit({ icon });
+  }
+
+  /**
+   *
+   * Set owner of this guild, if the bot owns the server
+   * @param owner - The owner of the guild. TODO: Accept user id, user object or member object
+   */
+  public setOwner(owner: Snowflake) {
+    // TODO: Check if bot owns the server
+    return this.edit({ ownerId: owner });
+  }
+
+  /**
+   *
+   * Set splash of this guild.
+   * @param splash - The splash to set as the guild splash.
+   */
+  public setSplash(splash: unknown | null) {
+    return this.edit({ splash });
+  }
+
+  /**
+   *
+   * Set discovery splash of this guild.
+   * @param splash - The discovery splash to set as the guild splash.
+   */
+  public setDiscoverSplash(splash: unknown | null) {
+    return this.edit({ discoverySplash: splash });
+  }
+
+  /**
+   *
+   * Set banner of this guild.
+   * @param banner - The banner to set as the guild banner.
+   */
+  public setBanner(banner: unknown | null) {
+    return this.edit({ banner });
+  }
+
+  /**
+   *
+   * Set system channel of this guild.
+   * @param channel - The channel to set as the system channel. TODO: Accept channel id or channel object
+   */
+  public setSystemChannel(channel: Snowflake | null) {
+    // TODO: Check channel is a text channel
+    return this.edit({ systemChannelId: channel });
+  }
+
+  /**
+   *
+   * Set system channel flags of this guild.
+   * @param flags - The flags to set as the sytem channel flags.
+   */
+  public setSystemChannelFlags(flags: GuildSystemChannelFlags) {
+    if (!(flags === 1 || flags === 2 || flags === 4 || flags === 8))
+      throw new RangeError('System channel flags must be equal 1, 2, 4 or 8.');
+    return this.edit({ systemChannelFlags: flags });
+  }
+
+  /**
+   *
+   * Set rules channel of this guild.
+   * @param channel - The channel to set as the rules channel. TODO: Accept channel id or channel object
+   */
+  public setRulesChannel(channel: Snowflake) {
+    // TODO: Check channel is a text channel
+    return this.edit({ rulesChannelId: channel });
+  }
+
+  /**
+   *
+   * Set public updates channel of this guild.
+   * @param channel - The channel to set as the public updates channel. TODO: Accept channel id or channel object
+   */
+  public setPublicUpdatesChannel(channel: Snowflake) {
+    // TODO: Check channel is a text channel
+    return this.edit({ publicUpdatesChannelId: channel });
+  }
+
+  /**
+   *
+   * Set preferred locale of this guild.
+   * @param locale - The locale to set as the guild locale.
+   */
+  public setPreferredLocale(locale: string) {
+    return this.edit({ preferredLocale: locale });
+  }
+
+  /**
+   *
+   * Set features of this guild.
+   * @param features - The features to set as the guild features.
+   */
+  public setFeatures(features: GuildFeature[]) {
+    return this.edit({ features });
+  }
+
+  /**
+   *
+   * Set description of this guild.
+   * @param description - The description of the guild.
+   */
+  public setDescription(description: string) {
+    if (!isString(description) || description.length > 120)
+      throw new TypeError('Description must be a string of less than 120 characters.');
+
+    return this.edit({ description });
+  }
+
+  /**
+   * Enable or disable the premium progress bar for this guild
+   * @param enabled - Whether the guild's boost progress bar should be enabled
+   * @returns
+   */
+  public setPremiumProgressBarEnabled(enabled: boolean) {
+    if (!isBoolean(enabled)) throw new TypeError('Enabled must be a boolean.');
+    return this.edit({ premiumProgressBarEnabled: enabled });
+  }
+
+  /**
+   *
+   * Edit this guild.
+   * @param data - The data to edit the guild with.
+   */
+  public async edit(data: GuildEditData) {
+    const _data: Record<PropertyKey, unknown> = {};
+
+    if ('name' in data) _data.name = data.name;
+    if ('verificationLevel' in data) _data.verification_level = data.verificationLevel;
+    if ('defaultMessageNotifications' in data)
+      _data.default_message_notifications = data.defaultMessageNotifications;
+    if ('explicitContentFilter' in data) _data.explicit_content_filter = data.explicitContentFilter;
+    if ('afkChannelId' in data) _data.afk_channel_id = data.afkChannelId;
+    if ('afkTimeout' in data) _data.afk_timeout = data.afkTimeout;
+    if ('icon' in data) _data.icon = data.icon;
+    if ('ownerId' in data) _data.owner_id = data.ownerId;
+    if ('splash' in data) _data.splash = data.splash;
+    if ('discoverySplash' in data) _data.discovery_splash = data.discoverySplash;
+    if ('banner' in data) _data.banner = data.banner;
+    if ('systemChannelId' in data) _data.system_channel_id = data.systemChannelId;
+    if ('systemChannelFlags' in data) _data.system_channel_flags = data.systemChannelFlags;
+    if ('rulesChannelId' in data) _data.rules_channel_id = data.rulesChannelId;
+    if ('publicUpdatesChannelId' in data) _data.public_updates_channel_id = data.publicUpdatesChannelId;
+    if ('preferredLocale' in data) _data.preferred_locale = data.preferredLocale;
+    if ('features' in data) _data.features = data.features;
+    if ('description' in data) _data.description = data.description;
+    if ('premiumProgressBarEnabled' in data) _data.premium_progress_bar_enabled = data.premiumProgressBarEnabled;
+
+    await this.client.rest.patch(URLManager.guild(this.id), {
+      body: JSON.stringify(_data)
+    });
+
+    return this;
   }
 
   /**
@@ -544,4 +772,26 @@ export class Guild extends Base {
   public get memberCount() {
     return this._memberCount;
   }
+}
+
+export interface GuildEditData {
+  name?: string;
+  verificationLevel?: GuildVerificationLevel | null;
+  defaultMessageNotifications?: GuildDefaultMessageNotifications | null;
+  explicitContentFilter?: GuildExplicitContentFilter | null;
+  afkChannelId?: Snowflake | null;
+  afkTimeout?: number;
+  icon?: unknown | null /* TODO: change type */;
+  ownerId?: Snowflake;
+  splash?: unknown | null /* TODO: change type */;
+  discoverySplash?: unknown | null /* TODO: change type */;
+  banner?: unknown | null /* TODO: change type */;
+  systemChannelId?: Snowflake | null;
+  systemChannelFlags?: GuildSystemChannelFlags;
+  rulesChannelId?: Snowflake | null;
+  publicUpdatesChannelId?: Snowflake | null;
+  preferredLocale?: string | null;
+  features?: GuildFeature[];
+  description?: string | null;
+  premiumProgressBarEnabled?: boolean;
 }
