@@ -1,4 +1,4 @@
-import { isKeyOf, isObject, isString } from '../Utils/Utils.ts';
+import { isKeyOf, isNumber, isObject, isString } from '../Utils/Utils.ts';
 
 /**
  * @class
@@ -163,23 +163,25 @@ export class Color extends null {
    * Resolves a color.
    * @param color The color to resolve
    */
-  public static resolve(color: keyof typeof this.DefaultColors): number;
-  public static resolve(color: string): number;
+  public static resolve(color: DefaultColors): number;
+  public static resolve(color: HexColor): number;
   public static resolve(color: RGBColor): number;
-  public static resolve(color: ColorResolvable): number {
+  public static resolve(color: ColorResolvable): number;
+  public static resolve(color: unknown): number {
     if (isString(color)) {
       // If hex string, return hex color
       if (hexRegex.test(color)) {
         color = color.slice(1);
         if (color === '000') color = color.padEnd(6, '0');
         else if (color === 'FFF' || color === 'fff') color = color.padEnd(6, 'F');
-        return parseInt(color, 16);
+        return parseInt(color as string, 16);
       } else if (isKeyOf(this.DefaultColors, color)) {
         // If color is in DefaultColors, return its color
         return this.DefaultColors[color];
       } else throw new Error('Unknown color: ' + color);
-    } else if (isObject(color)) {
+    } else if (isObject<RGBColor>(color) && isKeyOf(color, 'r') && isKeyOf(color, 'g') && isKeyOf(color, 'b')) {
       // If color is rgb object, return rgb color
+      if (!validRGB(color)) throw new Error('Invalid rgb color: ' + color);
       const { r, g, b } = color;
       return (r << 16) + (g << 8) + b;
     } else throw new TypeError(`${color} is not a valid color.`);
@@ -192,11 +194,46 @@ export class Color extends null {
   public static random() {
     return Math.floor(Math.random() * 0xffffff);
   }
+
+  /**
+   * Convert resolvable color or number value to hex string.
+   * @param color - The color to convert to hex.
+   */
+  public static toHex(color: DefaultColors): string;
+  public static toHex(color: RGBColor): string;
+  public static toHex(color: number): string;
+  public static toHex(color: unknown): string {
+    const resolved = isNumber(color) ? color : this.resolve(color as ColorResolvable);
+    return '#' + resolved.toString(16).padStart(6, '0');
+  }
+
+  /**
+   * Convert resolvable color or number value to rgb object.
+   * @param color - The color to convert to rgb.
+   */
+  public static toRGB(color: DefaultColors): RGBColor;
+  public static toRGB(color: HexColor): RGBColor;
+  public static toRGB(color: number): RGBColor;
+  public static toRGB(color: unknown): RGBColor {
+    const resolved = isNumber(color) ? color : this.resolve(color as ColorResolvable);
+    return {
+      r: (resolved >> 16) & 0xff,
+      g: (resolved >> 8) & 0xff,
+      b: resolved & 0xff
+    };
+  }
 }
 
 const hexRegex = /^#(?:[0-9a-f]{3}){1,2}$/i;
 
 export type ColorResolvable = HexColor | RGBColor | DefaultColors;
-export type HexColor = string;
+export type HexColor = `#${string}`;
 export type RGBColor = { r: number; g: number; b: number };
 export type DefaultColors = keyof typeof Color.DefaultColors;
+
+const validRGB = (rgb: RGBColor) => {
+  const { r, g, b } = rgb;
+  return (
+    isNumber(r) && isNumber(g) && isNumber(b) && r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255
+  );
+};
