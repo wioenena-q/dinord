@@ -11,9 +11,9 @@ import type { APIEmoji } from 'https://deno.land/x/discord_api_types@0.37.2/v10.
  */
 export class GuildEmojiManager extends BaseManagerForGuild<Snowflake, GuildEmoji> {
   public add(data: APIEmoji) {
-    const exists = this.get(data.id!);
+    const exists = this.cache.get(data.id!);
 
     if (exists) exists.patch(data);
-    else this.set(data.id!, new GuildEmoji(this.guild, data));
+    else this.cache.set(data.id!, new GuildEmoji(this.guild, data));
   }
 }

@@ -11,8 +11,8 @@ import type { APISticker } from 'https://deno.land/x/discord_api_types@0.37.2/v1
  */
 export class GuildStickerManager extends BaseManagerForGuild<Snowflake, GuildSticker> {
   public add(data: APISticker) {
-    const exists = this.get(data.id);
+    const exists = this.cache.get(data.id);
     if (exists) exists.patch(data);
-    else this.set(data.id, new GuildSticker(this.guild, data));
+    else this.cache.set(data.id, new GuildSticker(this.guild, data));
   }
 }
