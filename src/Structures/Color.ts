@@ -165,7 +165,6 @@ export class Color extends null {
    */
   public static resolve(color: keyof typeof this.DefaultColors): number;
   public static resolve(color: string): number;
-  public static resolve(color: Color): number;
   public static resolve(color: RGBColor): number;
   public static resolve(color: ColorResolvable): number;
   public static resolve(color: ColorResolvable): number {
