@@ -1,11 +1,11 @@
-import { Collection } from '../../deps.ts';
 import { Guild } from '../../Structures/Guild/Guild.ts';
+import { CachedManager } from '../CachedManager.ts';
 
 /**
  * @class
  * @classdesc Base manager for guild managers
  */
-export abstract class BaseManagerForGuild<K, V> extends Collection<K, V> {
+export abstract class BaseManagerForGuild<K, V> extends CachedManager<K, V> {
   #guild: Guild;
 
   public constructor(guild: Guild) {
