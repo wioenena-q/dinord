@@ -8,7 +8,7 @@ import {
   GuildStickerManager,
   GuildVoiceStateManager
 } from '../../Managers/Guild/mod.ts';
-import { toObject } from '../../Utils/Utils.ts';
+import { defineReadonlyProperty, toObject } from '../../Utils/Utils.ts';
 import { Base } from '../Base.ts';
 
 import type { Client } from '../../Client/Client.ts';
@@ -26,6 +26,7 @@ import type {
   GuildVerificationLevel,
   Snowflake
 } from '../../deps.ts';
+import { DiscordSnowflake } from '../DiscordSnowflake.ts';
 
 /**
  *
@@ -36,7 +37,11 @@ export class Guild extends Base {
   /**
    * ID of the guild.
    */
-  public readonly id!: Snowflake;
+  public declare readonly id: Snowflake;
+  /**
+   * Created timestamp of this guild.
+   */
+  public declare readonly createdTimestamp: number;
   protected declare _available: boolean;
   protected declare _name: string | null;
   protected declare _icon: string | null;
@@ -116,8 +121,9 @@ export class Guild extends Base {
   public constructor(client: Client, data: APIGuild | APIUnavailableGuild) {
     super(client);
 
-    // Constant property
-    Object.defineProperty(this, 'id', { value: data.id });
+    // Define readonly properties
+    defineReadonlyProperty(this, 'id', data.id);
+    defineReadonlyProperty(this, 'createdTimestamp', DiscordSnowflake.getTimestampFromId(this.id));
 
     this.patch(data);
   }
@@ -219,6 +225,7 @@ export class Guild extends Base {
       toObject(this, [
         'client',
         'id',
+        'createdTimestamp',
         'available',
         'name',
         'icon',
