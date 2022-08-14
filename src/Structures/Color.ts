@@ -169,7 +169,6 @@ export class Color extends null {
   public static resolve(color: RGBColor): number;
   public static resolve(color: ColorResolvable): number;
   public static resolve(color: ColorResolvable): number {
-    // If color is Color instance, return its color
     if (isString(color)) {
       // If hex string, return hex color
       if (hexRegex.test(color)) {
