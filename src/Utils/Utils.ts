@@ -45,9 +45,9 @@ export const delay = (ms: number) =>
  * @param value - Value
  * @param attrs - Attributes, if any
  */
-export const defineReadonlyProperty = (
-  target: unknown,
-  prop: PropertyKey,
+export const defineReadonlyProperty = <T>(
+  target: T,
+  prop: keyof T,
   value: unknown,
   attrs: PropertyDescriptor = { enumerable: true }
 ) => {
