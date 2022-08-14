@@ -1,9 +1,9 @@
-import { Base } from '../Base.ts';
-
-import type { APIRole, Snowflake } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 import { toObject } from '../../Utils/Utils.ts';
+import { Base } from '../Base.ts';
 import { PermissionBitField } from '../PermissionBitField.ts';
-import { Guild } from './Guild.ts';
+
+import type { APIRole, Snowflake } from '../../deps.ts';
+import type { Guild } from './Guild.ts';
 
 /**
  * @class
