@@ -1,8 +1,3 @@
-export const getTimestampFromId = (id: string): number => {
-  const bId = BigInt(id);
-  return Number((bId >> 22n) + 1420070400000n);
-};
-
 export const isArray = <T>(val: unknown): val is T[] => isInstanceOf(val, Array) && Array.isArray(val);
 
 export const isString = (val: unknown): val is string => typeof val === 'string';
@@ -38,7 +33,27 @@ export const toObject = (target: any, keys: string[]): Record<PropertyKey, unkno
   return o as Record<PropertyKey, unknown>;
 };
 
-export const wait = (ms: number) =>
+export const delay = (ms: number) =>
   new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+
+/**
+ * Add a non-writable property to the object
+ * @param target - The target object
+ * @param prop - Property key
+ * @param value - Value
+ * @param attrs - Attributes, if any
+ */
+export const defineReadonlyProperty = (
+  target: unknown,
+  prop: PropertyKey,
+  value: unknown,
+  attrs: PropertyDescriptor = { enumerable: true }
+) => {
+  Object.defineProperty(target, prop, {
+    ...attrs,
+    writable: false,
+    value
+  });
+};
