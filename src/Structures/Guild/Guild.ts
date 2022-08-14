@@ -12,19 +12,19 @@ import { toObject } from '../../Utils/Utils.ts';
 import { Base } from '../Base.ts';
 
 import type { Client } from '../../Client/Client.ts';
-import {
-  type APIGuild,
-  type APIUnavailableGuild,
-  type GatewayGuildCreateDispatchData,
-  type GuildDefaultMessageNotifications,
-  type GuildExplicitContentFilter,
-  type GuildFeature,
-  type GuildMFALevel,
-  type GuildNSFWLevel,
-  type GuildPremiumTier,
-  type GuildSystemChannelFlags,
-  type GuildVerificationLevel,
-  type Snowflake
+import type {
+  APIGuild,
+  APIUnavailableGuild,
+  GatewayGuildCreateDispatchData,
+  GuildDefaultMessageNotifications,
+  GuildExplicitContentFilter,
+  GuildFeature,
+  GuildMFALevel,
+  GuildNSFWLevel,
+  GuildPremiumTier,
+  GuildSystemChannelFlags,
+  GuildVerificationLevel,
+  Snowflake
 } from '../../deps.ts';
 
 /**
