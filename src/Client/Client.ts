@@ -1,6 +1,6 @@
 import { Collection, EventEmitter } from '../deps.ts';
 import { URLManager } from '../Managers/URLManager.ts';
-import { isObject, isString, toObject } from '../Utils/Utils.ts';
+import { defineReadonlyProperty, isObject, isString, toObject } from '../Utils/Utils.ts';
 import { RESTClient } from './RESTClient.ts';
 import { WebSocketManager, type WebSocketManagerOptions } from './ws/WebSocketManager.ts';
 
@@ -13,12 +13,27 @@ import type { Shard } from './ws/Shard.ts';
  * @classdesc Client class for the Discord API
  */
 export class Client extends EventEmitter<IClientEvents> {
-  #ws: WebSocketManager;
-  #guilds = new Collection<Snowflake, Guild>();
-  #users = new Collection<Snowflake, unknown>();
+  /**
+   * WebSocket manager for connection, reconnection, disconnection, shards, etc.
+   */
+  public declare readonly ws: WebSocketManager;
+  /**
+   * Guild cache for this client.
+   */
+  public declare readonly guilds: Collection<Snowflake, Guild>;
+  /**
+   * User cache for this client.
+   */
+  public declare readonly users: Collection<Snowflake, unknown>;
   #user: null;
-  #options: ClientOptions;
-  #rest = new RESTClient(this);
+  /**
+   * Options for the Client
+   */
+  public declare readonly options: ClientOptions;
+  /**
+   * REST client for requests to the Discord API.
+   */
+  public declare readonly rest: RESTClient;
 
   /**
    *
@@ -28,18 +43,21 @@ export class Client extends EventEmitter<IClientEvents> {
     super();
     if (!isObject(options)) throw new TypeError('Client options must be an object');
 
-    this.#options = Object.assign({ token: null }, options);
-
     // Set user to null. Populated when the Ready event is triggered
     this.#user = null;
-    this.#ws = new WebSocketManager(this, this.#options.ws);
+
+    defineReadonlyProperty(this, 'options', Object.assign({ token: null }, options));
+    defineReadonlyProperty(this, 'ws', new WebSocketManager(this, this.options.ws));
+    defineReadonlyProperty(this, 'guilds', new Collection());
+    defineReadonlyProperty(this, 'users', new Collection());
+    defineReadonlyProperty(this, 'rest', new RESTClient(this));
 
     // Initialize URLManager
     URLManager.init({
       api: { version: 10 },
       ws: {
-        compress: this.#ws.options.compress,
-        encoding: this.#ws.options.encoding
+        compress: this.ws.options.compress,
+        encoding: this.ws.options.encoding
       }
     });
   }
@@ -51,13 +69,13 @@ export class Client extends EventEmitter<IClientEvents> {
    */
   public async login(token?: string): Promise<void> {
     // If token is not in the options and not sent as a parameter, it will throw an error.
-    if (this.#options.token === null && !isString(token)) throw new Error('No token provided');
+    if (this.options.token === null && !isString(token)) throw new Error('No token provided');
 
-    this.#options.token ??= token;
+    this.options.token ??= token;
     // If token type is not string, it will throw an error.
-    if (!isString(this.#options.token)) throw new TypeError('Token must be a string');
+    if (!isString(this.options.token)) throw new TypeError('Token must be a string');
 
-    await this.#ws.connect();
+    await this.ws.connect();
 
     return void 0;
   }
@@ -66,7 +84,7 @@ export class Client extends EventEmitter<IClientEvents> {
    * Disconnect to gateway
    */
   public destroy() {
-    this.#ws.close();
+    this.ws.close();
   }
 
   /**
@@ -79,7 +97,7 @@ export class Client extends EventEmitter<IClientEvents> {
   }
 
   public [Symbol.for('Deno.customInspect')](inspect: typeof Deno.inspect, options: Deno.InspectOptions) {
-    return inspect(toObject(this, ['ws', 'user', 'guilds', 'users', 'options', 'rest']), options);
+    return inspect(toObject(this, ['ws', 'guilds', 'users', 'options', 'rest', 'user']), options);
   }
 
   /**
@@ -97,38 +115,6 @@ export class Client extends EventEmitter<IClientEvents> {
    */
   public get user() {
     return this.#user;
-  }
-
-  /**
-   * WebSocket manager for connection, reconnection, disconnection, shards, etc.
-   */
-  public get ws() {
-    return this.#ws;
-  }
-
-  /**
-   * Guild cache for this client.
-   */
-  public get guilds() {
-    return this.#guilds;
-  }
-
-  /**
-   * User cache for this client.
-   */
-  public get users() {
-    return this.#users;
-  }
-
-  public get options() {
-    return this.#options;
-  }
-
-  /**
-   * REST client for requests to the Discord API.
-   */
-  public get rest() {
-    return this.#rest;
   }
 }
 
