@@ -1,7 +1,7 @@
+import { toObject } from '../../Utils/Utils.ts';
 import { Emoji } from '../Emoji.ts';
 
-import type { APIEmoji, Snowflake } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
-import { toObject } from '../../Utils/Utils.ts';
+import type { APIEmoji, Snowflake } from '../../deps.ts';
 import type { Guild } from './Guild.ts';
 
 export class GuildEmoji extends Emoji {
