@@ -1,9 +1,11 @@
 import { defineReadonlyProperty, toObject } from '../../Utils/Utils.ts';
 import { Base } from '../Base.ts';
+import { Color, type ColorResolvable } from '../Color.ts';
+import { DiscordSnowflake } from '../DiscordSnowflake.ts';
 import { PermissionBitField } from '../PermissionBitField.ts';
 
 import type { APIRole, Snowflake } from '../../deps.ts';
-import { DiscordSnowflake } from '../DiscordSnowflake.ts';
+import type { RoleEditData } from '../../Managers/Guild/GuildRoleManager.ts';
 import type { Guild } from './Guild.ts';
 
 /**
@@ -34,6 +36,7 @@ export class Role extends Base {
   protected declare _managed: boolean;
   protected declare _mentionable: boolean;
   protected declare _tags: Readonly<RoleTags> | null;
+  protected declare _editable: boolean;
 
   public constructor(guild: Guild, data: APIRole) {
     super(guild.client);
@@ -67,6 +70,107 @@ export class Role extends Base {
       if ('premium_subscriber' in data.tags!) tags.premiumSubscriber = data.tags.premium_subscriber;
       this._tags = Object.freeze(tags);
     } else this._tags = null;
+
+    this._editable = this.id !== this.guild.id && !this._managed;
+  }
+
+  /**
+   *
+   * Set name of this role.
+   * @param name - Name of the role.
+   * @param [reason] - Reason for changing the name value, if any
+   */
+  public setName(name: string, reason?: string) {
+    return this.edit({ name }, reason);
+  }
+
+  /**
+   *
+   * Set permissions of this role.
+   * @param permissions - Permissions to set for the role.
+   * @param [reason] - Reason for changing the permissions value, if any
+   */
+  public setPermissions(permissions: string, reason?: string) {
+    return this.edit({ permissions }, reason);
+  }
+
+  /**
+   *
+   * Set color of this role.
+   * @param color - Color to set for the role.
+   * @param [reason] - Reason for changing the color value, if any
+   */
+  public setColor(color: ColorResolvable, reason?: string) {
+    return this.edit({ color }, reason);
+  }
+
+  /**
+   *
+   * Set hoist of this role.
+   * @param hoist - Whether the role should be displayed separately in the sidebar.
+   * @param [reason] - Reason for changing the hoist value, if any
+   * @returns
+   */
+  public setHoist(hoist: boolean, reason?: string) {
+    return this.edit({ hoist }, reason);
+  }
+
+  /**
+   *
+   * Set icon of this role.
+   * @param icon - Icon to set for the role.
+   * @param [reason] - Reason for changing the icon value, if any
+   */
+  public setIcon(icon: unknown, reason?: string) {
+    return this.edit({ icon }, reason);
+  }
+
+  /**
+   *
+   * Set unicode emoji of this role.
+   * @param unicodeEmoji - Unicode emoji to set for the role.
+   * @param [reason] - Reason for changing the unicode emoji value, if any
+   */
+  public setUnicodeEmoji(unicodeEmoji: string, reason?: string) {
+    return this.edit({ unicodeEmoji }, reason);
+  }
+
+  /**
+   *
+   * Set mentionable of this role.
+   * @param mentionable - Whether the role should be mentionable.
+   * @param [reason] - Reason for changing the mentionable value, if any
+   */
+  public setMentionable(mentionable: boolean, reason?: string) {
+    return this.edit({ mentionable }, reason);
+  }
+
+  /**
+   *
+   * Edit a role position.
+   * @param position - Position to set for the role.
+   * @param reason - Reason for changing the position value, if any
+   */
+  public setPosition(position: number, reason?: string) {
+    return this.guild.roles.setPosition(this, position, reason);
+  }
+
+  /**
+   *
+   * Delete this role.
+   */
+  public delete() {
+    return this.guild.roles.delete(this);
+  }
+
+  /**
+   *
+   * @param data - Data to be edited for the role.
+   * @param [reason] - Reason for changing the data value, if any
+   */
+  public async edit(data: RoleEditData, reason?: string) {
+    await this.guild.roles.edit(this, data, reason);
+    return this;
   }
 
   public [Symbol.for('Deno.customInspect')](inspect: typeof Deno.inspect, options: Deno.InspectOptions) {
@@ -121,7 +225,11 @@ export class Role extends Base {
    * Hex color of the this role.
    */
   public get hexColor() {
-    return `#${this._color.toString(16).padStart(6, '0')}`;
+    return Color.toHex(this._color);
+  }
+
+  public get RGBColor() {
+    return Color.toRGB(this._color);
   }
 
   /**
@@ -178,6 +286,13 @@ export class Role extends Base {
    */
   public get tags() {
     return this._tags;
+  }
+
+  /**
+   * Whether this role is editable.
+   */
+  public get editable() {
+    return this._editable;
   }
 }
 
