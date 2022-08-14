@@ -1,15 +1,15 @@
-import { EventEmitter } from '../../deps.ts';
+import {
+  EventEmitter,
+  GatewayDispatchEvents,
+  GatewayOpcodes,
+  type GatewayReadyDispatchData,
+  type GatewayReceivePayload
+} from '../../deps.ts';
 import { URLManager } from '../../Managers/URLManager.ts';
 import { defineReadonlyProperty, isInstanceOf, toObject } from '../../Utils/Utils.ts';
 // Compression and decompression library
 import { Inflate } from 'https://deno.land/x/compress@v0.4.5/zlib/mod.ts?code';
-import {
-  GatewayDispatchEvents,
-  GatewayOpcodes,
-  type GatewayReadyDispatchData
-} from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 
-import type { GatewayReceivePayload } from 'https://deno.land/x/discord_api_types@0.37.2/v10.ts';
 import type { ToString } from '../../Utils/Types.ts';
 import type { WebSocketManager } from './WebSocketManager.ts';
 
