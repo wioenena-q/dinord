@@ -57,3 +57,6 @@ export const defineReadonlyProperty = <T, P extends keyof T>(
     value
   });
 };
+
+export const isKeyOf = <T extends Record<PropertyKey, unknown>>(obj: T, key: PropertyKey): key is keyof T =>
+  key in obj;
