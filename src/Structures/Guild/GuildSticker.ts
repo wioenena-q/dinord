@@ -1,13 +1,27 @@
-import { toObject } from '../../Utils/Utils.ts';
+import { defineReadonlyProperty, toObject } from '../../Utils/Utils.ts';
 import { Base } from '../Base.ts';
 
 import type { APISticker, Snowflake, StickerFormatType, StickerType } from '../../deps.ts';
+import { DiscordSnowflake } from '../DiscordSnowflake.ts';
 import type { Guild } from './Guild.ts';
 
 export class GuildSticker extends Base {
-  public readonly guildId!: Snowflake;
-  private declare _guild: Guild;
-  public readonly id!: Snowflake;
+  /**
+   * Guild ID this sticker is in.
+   */
+  public declare readonly guildId: Snowflake;
+  /**
+   * Guild this sticker is in.
+   */
+  public declare readonly guild: Guild;
+  /**
+   * Sticker ID.
+   */
+  public declare readonly id: Snowflake;
+  /**
+   * Created timestamp of this sticker.
+   */
+  public declare readonly createdTimestamp: number;
   protected declare _packId: Snowflake | null;
   protected declare _name: string;
   protected declare _description: string | null;
@@ -21,11 +35,11 @@ export class GuildSticker extends Base {
   public constructor(guild: Guild, data: APISticker) {
     super(guild.client);
 
-    Object.defineProperties(this, {
-      id: { value: data.id },
-      guildId: { value: data.guild_id! },
-      _guild: { value: guild }
-    });
+    // Define readonly properties
+    defineReadonlyProperty(this, 'id', data.id);
+    defineReadonlyProperty(this, 'guildId', data.guild_id!);
+    defineReadonlyProperty(this, 'guild', guild);
+    defineReadonlyProperty(this, 'createdTimestamp', DiscordSnowflake.getTimestampFromId(this.id));
 
     this.patch(data);
   }
@@ -74,13 +88,6 @@ export class GuildSticker extends Base {
       ]),
       options
     );
-  }
-
-  /**
-   * Guild this sticker is in.
-   */
-  public get guild() {
-    return this._guild;
   }
 
   /**
