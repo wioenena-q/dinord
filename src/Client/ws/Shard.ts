@@ -1,6 +1,6 @@
 import { EventEmitter } from '../../deps.ts';
 import { URLManager } from '../../Managers/URLManager.ts';
-import { isInstanceOf, toObject } from '../../Utils/Utils.ts';
+import { defineReadonlyProperty, isInstanceOf, toObject } from '../../Utils/Utils.ts';
 // Compression and decompression library
 import { Inflate } from 'https://deno.land/x/compress@v0.4.5/zlib/mod.ts?code';
 import {
@@ -19,8 +19,14 @@ import type { WebSocketManager } from './WebSocketManager.ts';
  * @implements {ToString}
  */
 export class Shard extends EventEmitter<IShardEvents> implements ToString {
-  #id: number;
-  #manager: WebSocketManager;
+  /**
+   * ID of this shard.
+   */
+  public declare readonly id: number;
+  /**
+   * WebSocketManager instance
+   */
+  public declare readonly manager: WebSocketManager;
   #sessionId: string | null = null;
   // WebSocket connection for this shard
   #ws?: WebSocket | null = null;
@@ -42,10 +48,12 @@ export class Shard extends EventEmitter<IShardEvents> implements ToString {
    */
   public constructor(manager: WebSocketManager, id: number) {
     super();
-    this.#id = id;
-    this.#manager = manager;
 
-    if (this.#manager.options.compress) {
+    // Define readonly properties
+    defineReadonlyProperty(this, 'id', id);
+    defineReadonlyProperty(this, 'manager', manager);
+
+    if (this.manager.options.compress) {
       this.#inflate = new Inflate({
         // 128KB
         chunkSize: 128 * 1024,
@@ -135,11 +143,11 @@ export class Shard extends EventEmitter<IShardEvents> implements ToString {
         data = this.#inflate.strm.output.slice(0, this.#inflate.strm.next_out);
 
         // If encoding is "json", decode
-        if (this.#manager.options.encoding === 'json') data = this.#manager.decoder.decode(data);
+        if (this.manager.options.encoding === 'json') data = this.manager.decoder.decode(data);
       }
     } else data = message.data;
 
-    this.#onPacked(this.#manager.unpack(data));
+    this.#onPacked(this.manager.unpack(data));
   }
 
   /**
@@ -206,22 +214,20 @@ export class Shard extends EventEmitter<IShardEvents> implements ToString {
     } else {
       // First connection to gateway
       const d = {
-        token: this.#manager.client.options.token,
+        token: this.manager.client.options.token,
         properties: {
           os: Deno.build.os,
           browser: 'dinord',
           device: 'dinord'
         },
-        large_threshold: this.#manager.options.largeThreshold,
-        shard: [this.#id, this.#manager.options.shardCount],
-        intents: this.#manager.options.intents,
-        compress: this.#manager.options.compress
+        large_threshold: this.manager.options.largeThreshold,
+        shard: [this.id, this.manager.options.shardCount],
+        intents: this.manager.options.intents,
+        compress: this.manager.options.compress
       };
-      this.#ws!.send(this.#manager.pack({ op: GatewayOpcodes.Identify, d }));
+      this.#ws!.send(this.manager.pack({ op: GatewayOpcodes.Identify, d }));
       this.#debug(
-        `[IDENTIFY] Shard ${this.id}/${this.#manager.options.shardCount} with intents ${
-          this.#manager.options.intents
-        }`
+        `[IDENTIFY] Shard ${this.id}/${this.manager.options.shardCount} with intents ${this.manager.options.intents}`
       );
     }
   }
@@ -233,15 +239,15 @@ export class Shard extends EventEmitter<IShardEvents> implements ToString {
    */
   #handleEvent(eventName: GatewayDispatchEvents, data: unknown) {
     // Get event handler.
-    const event = this.#manager.events.get(eventName);
+    const event = this.manager.events.get(eventName);
 
     if (event === undefined) return;
 
     if (eventName === GatewayDispatchEvents.Ready) {
       this.#sessionId = (data as GatewayReadyDispatchData).session_id;
       // Set to total guild count.
-      if (this.#manager.totalGuildCount !== (data as GatewayReadyDispatchData).guilds.length)
-        this.#manager.totalGuildCount = (data as GatewayReadyDispatchData).guilds.length;
+      if (this.manager.totalGuildCount !== (data as GatewayReadyDispatchData).guilds.length)
+        this.manager.totalGuildCount = (data as GatewayReadyDispatchData).guilds.length;
       this.emit(ShardEvents.Ready);
     }
 
@@ -260,7 +266,7 @@ export class Shard extends EventEmitter<IShardEvents> implements ToString {
         this.#lastPingTimestamp = Date.now();
         this.#debug(`Sent heartbeat to gateway.`);
         this.#ws!.send(
-          this.#manager.pack({
+          this.manager.pack({
             op: GatewayOpcodes.Heartbeat,
             d: this.#sequence
           })
@@ -276,7 +282,7 @@ export class Shard extends EventEmitter<IShardEvents> implements ToString {
   }
 
   #debug(message: string) {
-    this.#manager.client.debug(`[Dinord => Shard (${this.#id})]: ${message}`);
+    this.manager.client.debug(`[Dinord => Shard (${this.id})]: ${message}`);
   }
 
   public [Symbol.for('Deno.customInspect')](inspect: typeof Deno.inspect, options: Deno.InspectOptions) {
@@ -284,23 +290,7 @@ export class Shard extends EventEmitter<IShardEvents> implements ToString {
   }
 
   public toString() {
-    return `Shard (id: ${this.#id}, state: ${this.#state})`;
-  }
-
-  /**
-   *
-   * ID of the shard
-   */
-  public get id() {
-    return this.#id;
-  }
-
-  /**
-   *
-   * WebSocketManager instance
-   */
-  public get manager() {
-    return this.#manager;
+    return `Shard (id: ${this.id}, state: ${this.#state})`;
   }
 
   /**
