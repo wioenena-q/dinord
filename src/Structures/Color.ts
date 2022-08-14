@@ -166,7 +166,6 @@ export class Color extends null {
   public static resolve(color: keyof typeof this.DefaultColors): number;
   public static resolve(color: string): number;
   public static resolve(color: RGBColor): number;
-  public static resolve(color: ColorResolvable): number;
   public static resolve(color: ColorResolvable): number {
     if (isString(color)) {
       // If hex string, return hex color
