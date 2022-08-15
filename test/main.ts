@@ -1,6 +1,5 @@
 import { config } from 'https://deno.land/x/dotenv@v3.2.0/mod.ts?code';
 import { Client } from '../src/Client/Client.ts';
-import { Color } from '../src/Structures/Color.ts';
 import { allIntents } from '../src/Utils/dev.ts';
 
 config({ export: true });
@@ -8,24 +7,19 @@ config({ export: true });
 const client = new Client({
   ws: {
     intents: allIntents(),
-    shardCount: 1
+    shardCount: 1,
+    encoding: 'etf',
+    compress: true
   }
 });
 
-let i = 0;
-let interval: number;
 client.on('ready', () => {
   const g = client.guilds.get('1000004567452352552');
   if (g) {
-    interval = setInterval(() => {
-      g.roles.create({
-        color: Color.random()
-      });
-      i++;
-      if (i === 10) {
-        clearInterval(interval!);
-      }
-    }, 1000);
+    const role = g.roles.cache.get(g.id);
+    if (role) {
+      role.setPermissions(role.permissions);
+    }
   }
 });
 
