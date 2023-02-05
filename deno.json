@@ -1,4 +1,8 @@
 {
+  "tasks": {
+    "start": "deno run --allow-net --allow-read --allow-env --unstable test/main.ts",
+    "start:watch": "deno run --watch --allow-net --allow-read --allow-env --unstable test/main.ts"
+  },
   "fmt": {
     "options": {
       "singleQuote": true
