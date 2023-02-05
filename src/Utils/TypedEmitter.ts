@@ -8,7 +8,7 @@ export class TypedEmitter<T extends Record<string | symbol, unknown[]>>
   ) => this;
   declare on: <E extends keyof T>(
     eventName: E,
-    listener: (...args: T[]) => void,
+    listener: (...args: T[E]) => void,
   ) => this;
   declare once: <E extends keyof T>(
     eventName: E,
