@@ -22,7 +22,7 @@ export class Zlib {
         resolve(null);
       }
 
-      inflate(new Uint8Array(this.arrayBuffer), {
+      inflate(this.arrayBuffer, {
         chunkSize: 1024 * 1024,
         flush: ZLIB_CONSTANTS.Z_SYNC_FLUSH,
         finishFlush: ZLIB_CONSTANTS.Z_SYNC_FLUSH,
