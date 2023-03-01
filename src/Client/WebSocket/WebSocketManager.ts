@@ -1,14 +1,22 @@
 import { Nullable, wait } from '../../Utils/Utils.ts';
 import { Client } from '../Client.ts';
 import { Shard } from './Shard.ts';
+import { Zlib } from './Zlib.ts';
 
 export class WebSocketManager implements IWebSocketManager {
   private readonly shardQueue: Shard[] = [];
   public readonly shards: Shard[] = [];
   private totalShardCount = 0;
   private maxConcurrency: Nullable<number> = null;
+  public readonly GATEWAY_URL = 'wss://gateway.discord.gg/?v=10';
+  public readonly zlib = new Zlib();
 
-  constructor(public readonly client: Client) {}
+  constructor(public readonly client: Client) {
+    this.GATEWAY_URL += `&encoding=${this.options.encoding}`;
+    if (this.options.compress === true) {
+      this.GATEWAY_URL += '&compress=zlib-stream';
+    }
+  }
 
   public async connect() {
     const response = await this.client.rest.get('/gateway/bot');
