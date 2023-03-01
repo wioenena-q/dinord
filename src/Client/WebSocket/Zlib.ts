@@ -1,7 +1,7 @@
 import { type Buffer, inflate, ZLIB_CONSTANTS } from '../../deps.ts';
 
 export class Zlib {
-  private arrayBuffer = new Uint8Array(0).buffer as ArrayBuffer;
+  private arrayBuffer: Uint8Array = new Uint8Array(0);
   public state = ZlibState.NOT_INITIALIZED;
   public static readonly ZLIB_SUFFIX = [0x00, 0x00, 0xff, 0xff];
 
@@ -12,7 +12,7 @@ export class Zlib {
           ...new Uint8Array(this.arrayBuffer),
           ...data,
         ],
-      ).buffer;
+      );
 
       if (
         data.byteLength < 4 ||
