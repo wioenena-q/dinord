@@ -1,5 +1,5 @@
 import { Client } from '../src/Client/Client.ts';
-import 'https://deno.land/std@0.178.0/dotenv/load.ts';
+import 'dotenv/load.ts';
 
 const client = new Client(
   {
