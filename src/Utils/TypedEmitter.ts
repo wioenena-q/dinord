@@ -1,4 +1,4 @@
-import { EventEmitter } from '../deps.ts';
+import { EventEmitter } from 'node:events';
 
 export class TypedEmitter<T extends Record<string | symbol, unknown[]>>
   extends EventEmitter {
