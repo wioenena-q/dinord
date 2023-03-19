@@ -31,7 +31,7 @@ export class WebSocketManager implements IWebSocketManager {
   }
 
   public disconnect() {
-    throw new Error('Method not implemented.');
+    return Promise.reject('Method not implemented.');
   }
 
   public createShards() {
