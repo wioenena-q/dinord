@@ -1,4 +1,3 @@
-import { assert } from '../../deps.ts';
 import { wait } from '../../Utils/Utils.ts';
 
 export class RESTClient {
