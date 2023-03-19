@@ -1,6 +1,7 @@
 {
+  "importMap": "import_map.json",
   "tasks": {
-    "start": "deno run --allow-net --allow-read --allow-env --unstable test/main.ts",
+    "start": "deno run --check --allow-net --allow-read --allow-env --unstable test/main.ts",
     "start:watch": "deno run --watch --allow-net --allow-read --allow-env --unstable test/main.ts"
   },
   "fmt": {
