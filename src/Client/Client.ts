@@ -1,4 +1,4 @@
-import { assert } from '../deps.ts';
+import { assert } from 'testing/asserts.ts';
 import { TypedEmitter } from '../Utils/TypedEmitter.ts';
 import { RESTClient } from './REST/RESTClient.ts';
 import {
