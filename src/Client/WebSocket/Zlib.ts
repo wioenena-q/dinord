@@ -1,4 +1,4 @@
-import { type Buffer, inflate, ZLIB_CONSTANTS } from '../../deps.ts';
+import { constants as ZLIB_CONSTANTS, inflate } from 'node:zlib';
 
 export class Zlib {
   private arrayBuffer: Uint8Array = new Uint8Array(0);
@@ -6,7 +6,7 @@ export class Zlib {
   public static readonly ZLIB_SUFFIX = [0x00, 0x00, 0xff, 0xff];
 
   public decompress(data: Uint8Array) {
-    return new Promise<null | Buffer>((resolve, reject) => {
+    return new Promise<null | Uint8Array>((resolve, reject) => {
       this.arrayBuffer = new Uint8Array(
         [
           ...new Uint8Array(this.arrayBuffer),
@@ -26,7 +26,7 @@ export class Zlib {
         chunkSize: 1024 * 1024,
         flush: ZLIB_CONSTANTS.Z_SYNC_FLUSH,
         finishFlush: ZLIB_CONSTANTS.Z_SYNC_FLUSH,
-      }, (err: Error | null, chunk: Buffer) => {
+      }, (err: Error | null, chunk: Uint8Array) => {
         if (err) return reject(err);
         this.arrayBuffer = new Uint8Array();
         this.state = ZlibState.DECOMPRESSED;
