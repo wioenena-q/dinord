@@ -1,7 +1,7 @@
 {
-  "deno.enable": true,
-  "deno.unstable": false,
-  "deno.lint": true,
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "denoland.vscode-deno"
+	"deno.enable": true,
+	"deno.unstable": false,
+	"deno.lint": true,
+	"editor.defaultFormatter": "denoland.vscode-deno",
+	"editor.formatOnSave": true
 }

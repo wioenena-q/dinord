@@ -1,6 +1,0 @@
-{
-  "imports": {
-    "dotenv/": "https://deno.land/std@0.180.0/dotenv/",
-    "testing/": "https://deno.land/std@0.180.0/testing/"
-  }
-}
