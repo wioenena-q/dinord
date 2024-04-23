@@ -1,4 +1,4 @@
-export type Locale =
+export type ApiLocale =
 	| "id"
 	| "da"
 	| "de"
