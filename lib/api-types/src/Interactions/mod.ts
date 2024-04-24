@@ -1,3 +1,3 @@
-export type * from "./ApplicationCommands.ts";
-export type * from "./Interaction.ts";
-export type * from "./MessageComponents.ts";
+export * from "./ApplicationCommands.ts";
+export * from "./Interaction.ts";
+export * from "./MessageComponents.ts";
