@@ -1,3 +1,10 @@
+export interface IApiSessionStartLimit {
+	total: number;
+	remaining: number;
+	reset_after: number;
+	max_concurrency: number;
+}
+
 export const enum ApiGatewayIntent {
 	GUILDS = (1 << 0),
 	GUILD_MEMBERS = (1 << 1),

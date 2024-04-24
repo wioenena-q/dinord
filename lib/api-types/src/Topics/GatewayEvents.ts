@@ -1,21 +1,21 @@
-import type { IApiApplication } from "../../Resources/Application.ts";
+import type { IApiApplication } from "../Resources/Application.ts";
 import type {
 	ApiTriggerType,
 	IApiAutoModerationAction,
-} from "../../Resources/AutoModeration.ts";
-import type { IApiChannel, IApiThreadMember } from "../../Resources/Channel.ts";
-import type { IApiEmoji } from "../../Resources/Emoji.ts";
+} from "../Resources/AutoModeration.ts";
+import type { IApiChannel, IApiThreadMember } from "../Resources/Channel.ts";
+import type { IApiEmoji } from "../Resources/Emoji.ts";
 import type {
 	IApiGuildMember,
 	IApiUnavailableGuild,
-} from "../../Resources/Guild.ts";
-import type { IApiGuildScheduledEvent } from "../../Resources/GuildScheduledEvent.ts";
-import type { ApiInviteTargetType } from "../../Resources/Invite.ts";
-import type { IApiStageInstance } from "../../Resources/StageInstance.ts";
-import type { IApiSticker } from "../../Resources/Sticker.ts";
-import type { IApiUser } from "../../Resources/User.ts";
-import type { IApiVoiceState } from "../../Resources/Voice.ts";
-import type { Optional, Snowflake } from "../../mod.ts";
+} from "../Resources/Guild.ts";
+import type { IApiGuildScheduledEvent } from "../Resources/GuildScheduledEvent.ts";
+import type { ApiInviteTargetType } from "../Resources/Invite.ts";
+import type { IApiStageInstance } from "../Resources/StageInstance.ts";
+import type { IApiSticker } from "../Resources/Sticker.ts";
+import type { IApiUser } from "../Resources/User.ts";
+import type { IApiVoiceState } from "../Resources/Voice.ts";
+import type { Optional, Snowflake } from "../mod.ts";
 
 export interface IApiPayload {
 	op: number;
