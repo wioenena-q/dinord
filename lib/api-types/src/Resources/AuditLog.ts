@@ -1,5 +1,5 @@
-import { IApiApplicationCommand } from "../Interactions/ApplicationCommands.ts";
-import { Optional, Snowflake } from "../mod.ts";
+import type { IApiApplicationCommand } from "../Interactions/ApplicationCommands.ts";
+import type { Optional, Snowflake } from "../mod.ts";
 
 export interface IApiAuditLog {
 	application_commands: IApiApplicationCommand[];

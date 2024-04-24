@@ -1,4 +1,4 @@
-import { Snowflake } from "../mod.ts";
+import type { Snowflake } from "../mod.ts";
 
 export interface IApiAutoModerationRule {
 	id: Snowflake;

@@ -1,7 +1,7 @@
-import { Optional } from "../mod.ts";
-import { IApiApplication } from "./Application.ts";
-import { IApiChannel } from "./Channel.ts";
-import { IApiGuild, IApiGuildMember } from "./Guild.ts";
+import type { Optional } from "../mod.ts";
+import type { IApiApplication } from "./Application.ts";
+import type { IApiChannel } from "./Channel.ts";
+import type { IApiGuild, IApiGuildMember } from "./Guild.ts";
 
 export interface IApiInvite {
 	code: string;

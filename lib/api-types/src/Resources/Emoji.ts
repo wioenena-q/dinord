@@ -1,4 +1,4 @@
-import { Optional, Snowflake } from "../mod.ts";
+import type { Optional, Snowflake } from "../mod.ts";
 
 export interface IApiEmoji {
 	id: Optional<Snowflake>;

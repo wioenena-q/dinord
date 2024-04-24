@@ -1,7 +1,6 @@
-import { Optional, Snowflake } from "../mod.ts";
-import { IApiApplication } from "./Application.ts";
-import { IApiChannel } from "./Channel.ts";
-import { IApiEmoji } from "./Emoji.ts";
+import type { Optional, Snowflake } from "../mod.ts";
+import type { IApiChannel } from "./Channel.ts";
+import type { IApiEmoji } from "./Emoji.ts";
 
 export interface IApiGuild {
 	id: Snowflake;

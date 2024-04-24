@@ -1,7 +1,7 @@
-import { Optional, Snowflake } from "../mod.ts";
-import { IApiChannel } from "./Channel.ts";
-import { IApiGuild } from "./Guild.ts";
-import { IApiUser } from "./User.ts";
+import type { Optional, Snowflake } from "../mod.ts";
+import type { IApiChannel } from "./Channel.ts";
+import type { IApiGuild } from "./Guild.ts";
+import type { IApiUser } from "./User.ts";
 
 export interface IApiWebhook {
 	id: Snowflake;

@@ -1,10 +1,10 @@
-import {
+import type {
 	ApiInteractionType,
 	IApiResolvedData,
 } from "../Interactions/Interaction.ts";
-import { IApiMessageComponents } from "../Interactions/MessageComponents.ts";
-import { Optional, Snowflake } from "../mod.ts";
-import { IApiApplication } from "./Application.ts";
+import type { IApiMessageComponents } from "../Interactions/MessageComponents.ts";
+import type { Optional, Snowflake } from "../mod.ts";
+import type { IApiApplication } from "./Application.ts";
 
 export interface IApiChannel {
 	id: Snowflake;
