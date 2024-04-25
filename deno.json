@@ -1,4 +1,9 @@
 {
+	"imports": {
+		"std/": "https://deno.land/std@0.223.0/",
+		"api-types/": "./lib/api-types/",
+		"collection/": "./lib/collection/"
+	},
 	"tasks": {
 	},
 	"lint": {
@@ -14,7 +19,6 @@
 				"no-await-in-loop",
 				"no-const-assign",
 				"no-eval",
-				"no-external-import",
 				"no-implicit-declare-namespace-export",
 				"no-inferrable-types",
 				"no-non-null-asserted-optional-chain",
