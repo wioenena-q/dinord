@@ -1,3 +1,9 @@
+export interface IApiGetGatewayBotResponse {
+	url: string;
+	shards: number;
+	session_start_limit: IApiSessionStartLimit;
+}
+
 export interface IApiSessionStartLimit {
 	total: number;
 	remaining: number;
