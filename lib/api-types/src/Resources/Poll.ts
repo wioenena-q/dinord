@@ -1,4 +1,4 @@
-import type { IApiEmoji } from "./Emoji.ts";
+import type { IApiEmoji } from "api-types/src/Resources/Emoji.ts";
 
 export interface IApiPoll {
 	question: IApiPollMedia;

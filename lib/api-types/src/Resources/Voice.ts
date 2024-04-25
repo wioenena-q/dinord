@@ -1,5 +1,5 @@
-import type { Optional, Snowflake } from "../mod.ts";
-import type { IApiGuildMember } from "./Guild.ts";
+import type { Optional, Snowflake } from "api-types/src/mod.ts";
+import type { IApiGuildMember } from "api-types/src/Resources/Guild.ts";
 
 export interface IApiVoiceState {
 	guild_id?: Snowflake;

@@ -1,4 +1,8 @@
-import type { Optional, Snowflake } from "../mod.ts";
+import type { ApiOAuth2Scope } from "api-types/src/Topics/OAuth2.ts";
+import type { IApiTeam } from "api-types/src/Topics/Teams.ts";
+import type { Optional, Snowflake } from "api-types/src/mod.ts";
+import type { IApiGuild } from "api-types/src/Resources/Guild.ts";
+import type { IApiUser } from "api-types/src/Resources/User.ts";
 
 export interface IApiApplication {
 	id: Snowflake;

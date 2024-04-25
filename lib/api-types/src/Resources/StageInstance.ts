@@ -1,4 +1,4 @@
-import type { Optional, Snowflake } from "../mod.ts";
+import type { Optional, Snowflake } from "api-types/src/mod.ts";
 
 export interface IApiStageInstance {
 	id: Snowflake;

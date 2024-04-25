@@ -1,5 +1,6 @@
-import type { Optional, Snowflake } from "../mod.ts";
-import type { IApiGuildMember } from "./Guild.ts";
+import type { Optional, Snowflake } from "api-types/src/mod.ts";
+import type { IApiGuildMember } from "api-types/src/Resources/Guild.ts";
+import type { IApiUser } from "api-types/src/Resources/User.ts";
 
 export interface IApiGuildScheduledEvent {
 	id: Snowflake;
@@ -11,12 +12,12 @@ export interface IApiGuildScheduledEvent {
 	scheduled_start_time: string;
 	scheduled_end_time: Optional<string>;
 	privacy_level: ApiGuildScheduledEventPrivacyLevel;
-	status: ApiGuildScheduledEventStatu;
+	status: ApiGuildScheduledEventStatus;
 	entity_type: ApiGuildScheduledEventEntityType;
 	entity_id: Optional<Snowflake>;
 	entity_metadata: Optional<IApiGuildScheduledEventEntityMetadata>;
 	creator?: IApiUser;
-	user_count?: integer;
+	user_count?: number;
 	image?: Optional<string>;
 }
 

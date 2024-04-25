@@ -1,5 +1,8 @@
-import type { ApiLocale } from "../Reference/Locale.ts";
-import type { Optional, Snowflake } from "../mod.ts";
+import type { ApiLocale } from "api-types/src/Reference/Locale.ts";
+import type { ApiApplicationIntegrationType } from "api-types/src/Resources/Application.ts";
+import type { ApiChannelType } from "api-types/src/Resources/mod.ts";
+import type { Optional, Snowflake } from "api-types/src/mod.ts";
+import type { ApiInteractionContextType } from "api-types/src/Interactions/Interaction.ts";
 
 export interface IApiApplicationCommand {
 	id: Snowflake;
@@ -16,7 +19,7 @@ export interface IApiApplicationCommand {
 	default_permission?: Optional<boolean>;
 	nsfw?: boolean;
 	integration_types?: ApiApplicationIntegrationType[]; // TODO(wioenena) Check this type is array
-	contexts?: Optional<IApiInteractionContextType[]>;
+	contexts?: Optional<ApiInteractionContextType[]>;
 	version: Snowflake;
 }
 

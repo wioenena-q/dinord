@@ -1,15 +1,27 @@
-import type { ApiLocale } from "../Reference/Locale.ts";
-import type { Snowflake } from "../mod.ts";
+import type { IApiEntitlement } from "api-types/src/Monetization/Entitlement.ts";
+import type { ApiLocale } from "api-types/src/Reference/Locale.ts";
+import type {
+	IApiAllowedMentions,
+	IApiAttachment,
+	IApiChannel,
+	IApiEmbed,
+	IApiMessage,
+} from "api-types/src/Resources/Channel.ts";
+import type { IApiGuildMember } from "api-types/src/Resources/Guild.ts";
+import type { IApiPollCreateRequest } from "api-types/src/Resources/Poll.ts";
+import type { IApiUser } from "api-types/src/Resources/User.ts";
+import type { IApiRole } from "api-types/src/Topics/Permissions.ts";
+import type { Snowflake } from "api-types/src/mod.ts";
 import type {
 	ApiApplicationCommandOptionType,
 	ApiApplicationCommandType,
 	IApiApplicationCommandOptionChoice,
-} from "./ApplicationCommands.ts";
+} from "api-types/src/Interactions/ApplicationCommands.ts";
 import type {
 	ApiComponentType,
 	IApiMessageComponents,
 	IApiSelectOption,
-} from "./MessageComponents.ts";
+} from "api-types/src/Interactions/MessageComponents.ts";
 
 export interface IApiInteraction {
 	id: Snowflake;
@@ -134,3 +146,8 @@ export interface IApiInteractionCallbackModalData {
 	title: string;
 	components: IApiMessageComponents[];
 }
+
+export type IApiInteractionCallbackData =
+	| IApiInteractionCallbackMessageData
+	| IApiInteractionCallbackAutocompleteData
+	| IApiInteractionCallbackModalData;

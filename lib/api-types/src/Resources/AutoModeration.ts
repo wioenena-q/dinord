@@ -1,4 +1,4 @@
-import type { Snowflake } from "../mod.ts";
+import type { Snowflake } from "api-types/src/mod.ts";
 
 export interface IApiAutoModerationRule {
 	id: Snowflake;
@@ -6,7 +6,7 @@ export interface IApiAutoModerationRule {
 	name: string;
 	creator_id: Snowflake;
 	event_type: ApiEventType;
-	trigger_type: ApiTriggerTypes;
+	trigger_type: ApiTriggerType;
 	trigger_metadata: IApiTriggerMetadata;
 	actions: IApiAutoModerationAction[];
 	enabled: boolean;
@@ -45,7 +45,7 @@ export interface IApiAutoModerationAction {
 	metadata?: IApiActionMetadata;
 }
 
-export const enum ApiActionTypes {
+export const enum ApiActionType {
 	BLOCK_MESSAGE = 1,
 	SEND_ALERT_MESSAGE = 2,
 	TIMEOUT = 3,

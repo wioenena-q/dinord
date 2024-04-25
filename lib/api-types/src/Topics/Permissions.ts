@@ -1,4 +1,4 @@
-import type { Optional, Snowflake } from "../mod.ts";
+import type { Optional, Snowflake } from "api-types/src/mod.ts";
 
 export const enum ApiBitwisePermissionFlag {
 	CREATE_INSTANT_INVITE = (1 << 0),

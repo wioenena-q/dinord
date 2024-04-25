@@ -1,5 +1,6 @@
-import type { Optional, Snowflake } from "../mod.ts";
-import type { IApiGuild } from "./Guild.ts";
+import type { Optional, Snowflake } from "api-types/src/mod.ts";
+import type { IApiGuild } from "api-types/src/Resources/Guild.ts";
+import type { IApiUser } from "api-types/src/Resources/User.ts";
 
 export interface IApiGuildTemplate {
 	code: string;

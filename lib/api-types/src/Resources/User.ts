@@ -1,6 +1,6 @@
-import type { Optional, Snowflake } from "../mod.ts";
-import type { IApiApplicationRoleConnectionMetadata } from "./ApplicationRoleConnectionMetadata.ts";
-import type { IApiIntegration } from "./Guild.ts";
+import type { Optional, Snowflake } from "api-types/src/mod.ts";
+import type { IApiApplicationRoleConnectionMetadata } from "api-types/src/Resources/ApplicationRoleConnectionMetadata.ts";
+import type { IApiIntegration } from "api-types/src/Resources/Guild.ts";
 
 export interface IApiUser {
 	id: Snowflake;

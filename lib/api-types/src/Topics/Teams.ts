@@ -1,5 +1,5 @@
-import type { IApiUser } from "../Resources/User.ts";
-import type { Optional, Snowflake } from "../mod.ts";
+import type { Optional, Snowflake } from "api-types/src/mod.ts";
+import type { IApiUser } from "api-types/src/Resources/mod.ts";
 
 export const enum ApiTeamMemberRoleType {
 	Owner = "", // TODO(wioenena) Look into this
@@ -21,4 +21,9 @@ export interface IApiTeamMember {
 	team_id: Snowflake;
 	user: Partial<IApiUser>;
 	role: ApiTeamMemberRoleType;
+}
+
+export const enum ApiMembershipState {
+	INVITED = 1,
+	ACCEPTED = 2,
 }

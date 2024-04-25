@@ -1,7 +1,7 @@
-import type { IApiApplication } from "../Resources/Application.ts";
-import type { IApiUser } from "../Resources/User.ts";
+import type { IApiApplication } from "api-types/src/Resources/Application.ts";
+import type { IApiUser } from "api-types/src/Resources/mod.ts";
 
-export type OAuth2Scope =
+export type ApiOAuth2Scope =
 	| "activities.read"
 	| "activities.write"
 	| "applications.builds.read"

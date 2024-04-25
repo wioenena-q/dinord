@@ -1,7 +1,12 @@
-import type { Optional } from "../mod.ts";
-import type { IApiApplication } from "./Application.ts";
-import type { IApiChannel } from "./Channel.ts";
-import type { IApiGuild, IApiGuildMember } from "./Guild.ts";
+import type { Optional } from "api-types/src/mod.ts";
+import type { IApiApplication } from "api-types/src/Resources/Application.ts";
+import type { IApiChannel } from "api-types/src/Resources/Channel.ts";
+import type {
+	IApiGuild,
+	IApiGuildMember,
+} from "api-types/src/Resources/Guild.ts";
+import type { IApiGuildScheduledEvent } from "api-types/src/Resources/GuildScheduledEvent.ts";
+import type { IApiUser } from "api-types/src/Resources/User.ts";
 
 export interface IApiInvite {
 	code: string;

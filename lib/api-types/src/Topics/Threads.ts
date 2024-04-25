@@ -1,6 +1,9 @@
-import type { IApiThreadMetadata } from "../Resources/Channel.ts";
-import type { ApiChannelType, IApiChannel } from "../Resources/Channel.ts";
-import type { Snowflake } from "../mod.ts";
+import type {
+	ApiChannelType,
+	IApiChannel,
+	IApiThreadMetadata,
+} from "api-types/src/Resources/Channel.ts";
+import type { Snowflake } from "api-types/src/mod.ts";
 
 export interface IApiThread extends
 	Required<

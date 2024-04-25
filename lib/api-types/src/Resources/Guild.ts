@@ -1,6 +1,10 @@
-import type { Optional, Snowflake } from "../mod.ts";
-import type { IApiChannel } from "./Channel.ts";
-import type { IApiEmoji } from "./Emoji.ts";
+import type { ApiOAuth2Scope } from "api-types/src/Topics/OAuth2.ts";
+import type { IApiRole } from "api-types/src/Topics/Permissions.ts";
+import type { Optional, Snowflake } from "api-types/src/mod.ts";
+import type { IApiChannel } from "api-types/src/Resources/Channel.ts";
+import type { IApiEmoji } from "api-types/src/Resources/Emoji.ts";
+import type { IApiSticker } from "api-types/src/Resources/Sticker.ts";
+import type { IApiUser } from "api-types/src/Resources/User.ts";
 
 export interface IApiGuild {
 	id: Snowflake;

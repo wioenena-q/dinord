@@ -1,10 +1,19 @@
 import type {
 	ApiInteractionType,
+	IApiMessageInteraction,
 	IApiResolvedData,
-} from "../Interactions/Interaction.ts";
-import type { IApiMessageComponents } from "../Interactions/MessageComponents.ts";
-import type { Optional, Snowflake } from "../mod.ts";
-import type { IApiApplication } from "./Application.ts";
+} from "api-types/src/Interactions/Interaction.ts";
+import type { IApiMessageComponents } from "api-types/src/Interactions/MessageComponents.ts";
+import type { Optional, Snowflake } from "api-types/src/mod.ts";
+import type { IApiApplication } from "api-types/src/Resources/Application.ts";
+import type { IApiEmoji } from "api-types/src/Resources/Emoji.ts";
+import type { IApiGuildMember } from "api-types/src/Resources/Guild.ts";
+import type { IApiPollCreateRequest } from "api-types/src/Resources/Poll.ts";
+import type {
+	IApiSticker,
+	IApiStickerItem,
+} from "api-types/src/Resources/Sticker.ts";
+import type { IApiUser } from "api-types/src/Resources/User.ts";
 
 export interface IApiChannel {
 	id: Snowflake;

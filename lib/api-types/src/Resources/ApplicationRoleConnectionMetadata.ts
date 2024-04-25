@@ -1,4 +1,4 @@
-import type { ApiLocale } from "../Reference/Locale.ts";
+import type { ApiLocale } from "api-types/src/Reference/Locale.ts";
 
 export interface IApiApplicationRoleConnectionMetadata {
 	type: ApiApplicationRoleConnectionMetadataType;

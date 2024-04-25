@@ -1,5 +1,11 @@
-import type { IApiApplicationCommand } from "../Interactions/ApplicationCommands.ts";
-import type { Optional, Snowflake } from "../mod.ts";
+import type { IApiApplicationCommand } from "api-types/src/Interactions/ApplicationCommands.ts";
+import type { Optional, Snowflake } from "api-types/src/mod.ts";
+import type { IApiChannel } from "api-types/src/Resources/Channel.ts";
+import type { IApiIntegration } from "api-types/src/Resources/Guild.ts";
+import type { IApiGuildScheduledEvent } from "api-types/src/Resources/GuildScheduledEvent.ts";
+import type { IApiUser } from "api-types/src/Resources/User.ts";
+import type { IApiWebhook } from "api-types/src/Resources/Webhook.ts";
+import type { IApiAutoModerationRule } from "api-types/src/Resources/mod.ts";
 
 export interface IApiAuditLog {
 	application_commands: IApiApplicationCommand[];

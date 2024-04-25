@@ -1,4 +1,4 @@
-import type { Snowflake } from "../mod.ts";
+import type { Snowflake } from "api-types/src/mod.ts";
 
 export interface IApiSKU {
 	id: Snowflake;

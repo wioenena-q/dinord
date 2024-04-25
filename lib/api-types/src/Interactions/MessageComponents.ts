@@ -1,4 +1,6 @@
-import type { Snowflake } from "../mod.ts";
+import type { ApiChannelType } from "api-types/src/Resources/Channel.ts";
+import type { IApiEmoji } from "api-types/src/Resources/Emoji.ts";
+import type { Snowflake } from "api-types/src/mod.ts";
 
 export const enum ApiComponentType {
 	ActionRow = 1,
@@ -26,6 +28,14 @@ export interface IApiButton {
 	disabled?: boolean;
 }
 
+export const enum ApiButtonStyle {
+	Primary = 1,
+	Secondary = 2,
+	Success = 3,
+	Danger = 4,
+	Link = 5,
+}
+
 export interface IApiSelectMenu {
 	type:
 		| ApiComponentType.StringSelect
@@ -47,7 +57,7 @@ export interface IApiSelectOption {
 	label: string;
 	value: string;
 	description?: string;
-	emoji?: Parti<IApiEmoji>;
+	emoji?: Partial<IApiEmoji>;
 	default?: boolean;
 }
 
